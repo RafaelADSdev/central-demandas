@@ -1,0 +1,25 @@
+body {
+  margin: 0;
+  background: #F8FAFC;
+  font-family: Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a {
+  color: #2563EB;
+  text-decoration: none;
+}
+a:hover {
+  color: #1D4ED8;
+}
+input, select, button, textarea {
+  font-family: inherit;
+}
+::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 99px;
+  border: 3px solid #F8FAFC;
+}

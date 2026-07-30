@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: #F8FAFC; font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: #2563EB; text-decoration: none; }
+  a:hover { color: #1D4ED8; }
+  input, select, button, textarea { font-family: inherit; }
+  ::-webkit-scrollbar { height: 10px; width: 10px; }
+  ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; border: 3px solid #F8FAFC; }
+</style>
+</helmet>
+<div style="min-height:100vh;background:#F8FAFC;color:#0F172A;padding:24px 32px 56px;display:flex;flex-direction:column;gap:20px">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:34px;height:34px;border-radius:9px;background:#0F172A;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">D</div>
+      <div style="display:flex;flex-direction:column">
+        <span style="font-size:15px;font-weight:700;letter-spacing:-.01em">Central de Demandas</span>
+        <span style="font-size:11.5px;color:#94A3B8">Gestão de projetos, tarefas e desempenho</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:9px;background:{{ teamChipBg }};border:1px solid {{ teamChipBorder }};border-radius:10px;padding:6px 10px 6px 12px">
+        <span style="width:8px;height:8px;border-radius:99px;background:{{ teamDot }}"></span>
+        <span style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:{{ teamChipFg }}">Equipe</span>
+        <select value="{{ team }}" onChange="{{ onTeam }}" style="border:0;background:transparent;font-size:13px;font-weight:600;color:{{ teamChipFg }};outline:none;cursor:pointer;padding:2px 0">
+          <sc-for list="{{ teamOptions }}" as="tm" hint-placeholder-count="5">
+            <option value="{{ tm }}">{{ tm }}</option>
+          </sc-for>
+        </select>
+      </div>
+      <div style="display:flex;background:#F1F5F9;border:1px solid #E2E8F0;border-radius:10px;padding:3px;gap:3px;flex-wrap:wrap">
+        <button onClick="{{ goProjects }}" style="padding:7px 14px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ navProjBg }};color:{{ navProjFg }};box-shadow:{{ navProjShadow }}">Projetos</button>
+        <button onClick="{{ goLoose }}" style="padding:7px 14px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ navLooseBg }};color:{{ navLooseFg }};box-shadow:{{ navLooseShadow }}">Tarefas avulsas</button>
+        <button onClick="{{ goCal }}" style="padding:7px 14px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ navCalBg }};color:{{ navCalFg }};box-shadow:{{ navCalShadow }}">Calendário</button>
+        <button onClick="{{ goPerf }}" style="padding:7px 14px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ navPerfBg }};color:{{ navPerfFg }};box-shadow:{{ navPerfShadow }}">Desempenho</button>
+        <button onClick="{{ goReg }}" style="padding:7px 14px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ navRegBg }};color:{{ navRegFg }};box-shadow:{{ navRegShadow }}">Cadastros</button>
+      </div>
+      <button onClick="{{ openModal }}" style="display:flex;align-items:center;gap:7px;padding:9px 16px;border:0;border-radius:10px;background:#0F172A;color:#FFFFFF;font-size:12.5px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(15,23,42,.2)" style-hover="background:#1E293B">
+        <span style="font-size:15px;line-height:1">+</span>
+        <span>Nova demanda</span>
+      </button>
+    </div>
+  </div>
+
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding:48px 24px;overflow:auto" onClick="{{ closeModal }}">
+      <div onClick="{{ stop }}" style="background:#FFFFFF;border-radius:16px;box-shadow:0 24px 60px rgba(15,23,42,.25);width:640px;max-width:100%;display:flex;flex-direction:column;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #E2E8F0">
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <span style="font-size:16px;font-weight:700;letter-spacing:-.01em">{{ modalTitle }}</span>
+            <span style="font-size:12px;color:#94A3B8">Cadastre um projeto macro ou uma tarefa avulsa.</span>
+          </div>
+          <button onClick="{{ closeModal }}" style="width:30px;height:30px;border:0;border-radius:8px;background:#F1F5F9;color:#64748B;font-size:14px;cursor:pointer" style-hover="background:#E2E8F0;color:#0F172A">✕</button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px;padding:22px 24px;max-height:64vh;overflow:auto">
+          <sc-if value="{{ modalNeedsSetup }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:10px;background:#FFFBEB;border:1px solid #FDE68A">
+              <span style="font-size:12.5px;color:#92400E;font-weight:500">Cadastre ao menos 1 colaborador e 1 requerente antes de criar demandas.</span>
+              <button onClick="{{ goRegFromModal }}" style="padding:7px 14px;border:0;border-radius:8px;background:#D97706;color:#FFFFFF;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Ir para Cadastros</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isCreating }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;background:#F1F5F9;border:1px solid #E2E8F0;border-radius:10px;padding:3px;gap:3px;align-self:flex-start">
+              <button onClick="{{ setKindProject }}" style="padding:7px 18px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ kindProjBg }};color:{{ kindProjFg }};box-shadow:{{ kindProjShadow }}">Projeto macro</button>
+              <button onClick="{{ setKindLoose }}" style="padding:7px 18px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ kindLooseBg }};color:{{ kindLooseFg }};box-shadow:{{ kindLooseShadow }}">Tarefa avulsa</button>
+            </div>
+          </sc-if>
+
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Nome da demanda *</label>
+            <input value="{{ dName }}" onChange="{{ onDName }}" placeholder="{{ dNamePlaceholder }}" style="padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13.5px;outline:none" style-focus="border-color:#93C5FD;box-shadow:0 0 0 3px rgba(37,99,235,.12)" />
+          </div>
+
+          <sc-if value="{{ isProjDraft }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Descrição</label>
+              <textarea value="{{ dDesc }}" onChange="{{ onDDesc }}" placeholder="Escopo, contexto e resultado esperado..." rows="2" style="padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;outline:none;resize:vertical" style-focus="border-color:#93C5FD;box-shadow:0 0 0 3px rgba(37,99,235,.12)"></textarea>
+            </div>
+          </sc-if>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Quem demandou *</label>
+              <select value="{{ dRequester }}" onChange="{{ onDRequester }}" style="padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none;cursor:pointer">
+                <sc-for list="{{ requesterList }}" as="r" hint-placeholder-count="4">
+                  <option value="{{ r }}">{{ r }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <sc-if value="{{ isLooseDraft }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Pessoa responsável *</label>
+                <select value="{{ dOwner }}" onChange="{{ onDOwner }}" style="padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none;cursor:pointer">
+                  <sc-for list="{{ peopleList }}" as="o" hint-placeholder-count="6">
+                    <option value="{{ o }}">{{ o }}</option>
+                  </sc-for>
+                </select>
+              </div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Equipe</label>
+              <select value="{{ dTeam }}" onChange="{{ onDTeam }}" style="padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none;cursor:pointer">
+                <sc-for list="{{ teamList }}" as="tm" hint-placeholder-count="4">
+                  <option value="{{ tm }}">{{ tm }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Prazo final *</label>
+              <input type="date" value="{{ dDue }}" onChange="{{ onDDue }}" style="padding:9px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;outline:none;color:#334155" style-focus="border-color:#93C5FD;box-shadow:0 0 0 3px rgba(37,99,235,.12)" />
+            </div>
+            <sc-if value="{{ isLooseDraft }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Prioridade</label>
+                <select value="{{ dPriority }}" onChange="{{ onDPriority }}" style="padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none;cursor:pointer">
+                  <option value="Alta">Alta</option>
+                  <option value="Média">Média</option>
+                  <option value="Baixa">Baixa</option>
+                </select>
+              </div>
+            </sc-if>
+          </div>
+
+          <sc-if value="{{ showTaskRows }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:10px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:14px 16px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Microtarefas do projeto</span>
+                <button onClick="{{ addTaskRow }}" style="padding:5px 12px;border:1px solid #E2E8F0;border-radius:7px;background:#FFFFFF;color:#2563EB;font-size:12px;font-weight:600;cursor:pointer" style-hover="border-color:#93C5FD">+ Adicionar</button>
+              </div>
+              <sc-for list="{{ draftTasks }}" as="row" hint-placeholder-count="1">
+                <div style="display:grid;grid-template-columns:1fr 150px 130px 28px;gap:8px;align-items:center">
+                  <input value="{{ row.name }}" onChange="{{ row.onName }}" placeholder="Descrição da microtarefa" style="padding:8px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:12.5px;outline:none;background:#FFFFFF" style-focus="border-color:#93C5FD" />
+                  <select value="{{ row.owner }}" onChange="{{ row.onOwner }}" style="padding:8px 9px;border:1px solid #E2E8F0;border-radius:8px;font-size:12px;background:#FFFFFF;outline:none;cursor:pointer">
+                    <sc-for list="{{ peopleList }}" as="o" hint-placeholder-count="6">
+                      <option value="{{ o }}">{{ o }}</option>
+                    </sc-for>
+                  </select>
+                  <input type="date" value="{{ row.due }}" onChange="{{ row.onDue }}" style="padding:7px 9px;border:1px solid #E2E8F0;border-radius:8px;font-size:12px;outline:none;color:#334155;background:#FFFFFF" />
+                  <button onClick="{{ row.remove }}" title="Remover" style="width:28px;height:28px;border:0;border-radius:7px;background:transparent;color:#94A3B8;font-size:13px;cursor:pointer" style-hover="background:#FEF2F2;color:#DC2626">✕</button>
+                </div>
+              </sc-for>
+              <span style="font-size:11px;color:#94A3B8">Microtarefas sem prazo herdam o prazo final do projeto.</span>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasDraftError }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:10px 14px;border-radius:9px;background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;font-size:12.5px;font-weight:500">{{ draftError }}</div>
+          </sc-if>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid #E2E8F0;background:#F8FAFC">
+          <button onClick="{{ closeModal }}" style="padding:9px 18px;border:1px solid #E2E8F0;border-radius:9px;background:#FFFFFF;color:#475569;font-size:13px;font-weight:600;cursor:pointer" style-hover="border-color:#CBD5E1">Cancelar</button>
+          <button onClick="{{ submitDraft }}" style="padding:9px 20px;border:0;border-radius:9px;background:#0F172A;color:#FFFFFF;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#1E293B">{{ submitLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ taskEditOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:60;display:flex;align-items:flex-start;justify-content:center;padding:48px 24px;overflow:auto" onClick="{{ closeTask }}">
+      <div onClick="{{ stop }}" style="background:#FFFFFF;border-radius:16px;box-shadow:0 24px 60px rgba(15,23,42,.25);width:520px;max-width:100%;display:flex;flex-direction:column;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #E2E8F0">
+          <span style="font-size:15px;font-weight:700;letter-spacing:-.01em">{{ taskModalTitle }}</span>
+          <button onClick="{{ closeTask }}" style="width:30px;height:30px;border:0;border-radius:8px;background:#F1F5F9;color:#64748B;font-size:14px;cursor:pointer" style-hover="background:#E2E8F0;color:#0F172A">✕</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px;padding:20px 22px;max-height:64vh;overflow:auto">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Descrição *</label>
+            <input value="{{ tName }}" onChange="{{ onTName }}" placeholder="O que precisa ser feito" style="padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13.5px;outline:none" style-focus="border-color:#93C5FD;box-shadow:0 0 0 3px rgba(37,99,235,.12)" />
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Responsável</label>
+              <select value="{{ tOwner }}" onChange="{{ onTOwner }}" style="padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none;cursor:pointer">
+                <sc-for list="{{ peopleList }}" as="o" hint-placeholder-count="6">
+                  <option value="{{ o }}">{{ o }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Quem demandou</label>
+              <select value="{{ tRequester }}" onChange="{{ onTRequester }}" style="padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none;cursor:pointer">
+                <sc-for list="{{ requesterList }}" as="r" hint-placeholder-count="4">
+                  <option value="{{ r }}">{{ r }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Prazo *</label>
+              <input type="date" value="{{ tDue }}" onChange="{{ onTDue }}" style="padding:9px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;outline:none;color:#334155" />
+            </div>
+            <sc-if value="{{ tIsProj }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Categoria</label>
+                <input value="{{ tTag }}" onChange="{{ onTTag }}" placeholder="Ex.: Mídia paga, Web, Jurídico" style="padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;outline:none" style-focus="border-color:#93C5FD" />
+              </div>
+            </sc-if>
+            <sc-if value="{{ tIsLoose }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Prioridade</label>
+                <select value="{{ tPriority }}" onChange="{{ onTPriority }}" style="padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none;cursor:pointer">
+                  <option value="Alta">Alta</option>
+                  <option value="Média">Média</option>
+                  <option value="Baixa">Baixa</option>
+                </select>
+              </div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Status</label>
+              <select value="{{ tStatus }}" onChange="{{ onTStatus }}" style="padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none;cursor:pointer">
+                <sc-for list="{{ statusKeys }}" as="s" hint-placeholder-count="4">
+                  <option value="{{ s.key }}">{{ s.label }}</option>
+                </sc-for>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:13px 15px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <label style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B">Progresso</label>
+              <span style="font-size:14px;font-weight:700">{{ tProgress }}%</span>
+            </div>
+            <input type="range" min="0" max="100" step="5" value="{{ tProgress }}" onChange="{{ onTProgress }}" style="width:100%;accent-color:#0F172A;cursor:pointer" />
+            <span style="font-size:11px;color:#94A3B8">Marcar como Concluído define automaticamente 100% e registra a data de entrega.</span>
+          </div>
+          <sc-if value="{{ hasTaskError }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:10px 14px;border-radius:9px;background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;font-size:12.5px;font-weight:500">{{ taskError }}</div>
+          </sc-if>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:15px 22px;border-top:1px solid #E2E8F0;background:#F8FAFC">
+          <sc-if value="{{ tCanDelete }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ deleteTask }}" style="padding:9px 16px;border:1px solid #FECACA;border-radius:9px;background:#FFFFFF;color:#DC2626;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#FEF2F2">Excluir</button>
+          </sc-if>
+          <div style="flex:1"></div>
+          <button onClick="{{ closeTask }}" style="padding:9px 18px;border:1px solid #E2E8F0;border-radius:9px;background:#FFFFFF;color:#475569;font-size:13px;font-weight:600;cursor:pointer" style-hover="border-color:#CBD5E1">Cancelar</button>
+          <button onClick="{{ saveTask }}" style="padding:9px 20px;border:0;border-radius:9px;background:#0F172A;color:#FFFFFF;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#1E293B">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showProjects }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <sc-if value="{{ needsSetup }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;padding:18px 22px;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:14.5px;font-weight:700">Comece configurando sua operação</span>
+            <span style="font-size:12.5px;color:#64748B">Cadastre colaboradores, equipes e requerentes para depois criar projetos e tarefas.</span>
+          </div>
+          <button onClick="{{ goReg }}" style="padding:9px 18px;border:0;border-radius:9px;background:#0F172A;color:#FFFFFF;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#1E293B">Abrir Cadastros ›</button>
+        </div>
+      </sc-if>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em">Todos os projetos</h1>
+          <p style="margin:0;font-size:13px;color:#64748B">Clique em um projeto para abrir os desdobramentos em microtarefas.</p>
+        </div>
+        <div style="display:flex;gap:14px;flex-wrap:wrap">
+          <sc-for list="{{ portfolioStats }}" as="s" hint-placeholder-count="4">
+            <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:12px 18px;display:flex;flex-direction:column;gap:3px;min-width:120px">
+              <span style="font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#94A3B8">{{ s.label }}</span>
+              <span style="font-size:22px;font-weight:700;letter-spacing:-.02em;color:{{ s.color }}">{{ s.value }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <sc-if value="{{ noProjects }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:64px 24px;text-align:center;background:#FFFFFF;border:1px dashed #CBD5E1;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:12px">
+          <span style="font-size:15px;font-weight:700;color:#334155">Nenhum projeto cadastrado</span>
+          <span style="font-size:13px;color:#94A3B8;max-width:44ch;text-wrap:pretty">Crie seu primeiro projeto macro com as microtarefas, responsáveis e prazos da sua operação.</span>
+          <button onClick="{{ openModal }}" style="margin-top:6px;padding:10px 20px;border:0;border-radius:10px;background:#0F172A;color:#FFFFFF;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#1E293B">+ Criar primeiro projeto</button>
+        </div>
+      </sc-if>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px">
+        <sc-for list="{{ projects }}" as="p" hint-placeholder-count="2">
+          <div onClick="{{ p.open }}" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:16px;box-shadow:0 1px 2px rgba(15,23,42,.04);cursor:pointer;transition:box-shadow .15s ease,transform .15s ease,border-color .15s ease" style-hover="box-shadow:0 10px 26px rgba(15,23,42,.10);transform:translateY(-2px);border-color:#CBD5E1">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px">
+              <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:10.5px;font-weight:700;letter-spacing:.06em;color:#94A3B8">{{ p.code }}</span>
+                  <span style="font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:{{ p.stBg }};color:{{ p.stFg }}">{{ p.stLabel }}</span>
+                  <span style="font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:99px;background:{{ p.teamBg }};color:{{ p.teamFg }}">{{ p.teamName }}</span>
+                </div>
+                <span style="font-size:17px;font-weight:700;line-height:1.25;letter-spacing:-.01em;text-wrap:pretty">{{ p.name }}</span>
+              </div>
+              <span style="font-size:18px;color:#CBD5E1;padding-top:2px">›</span>
+            </div>
+            <div style="display:flex;gap:22px;flex-wrap:wrap">
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#94A3B8">Requerente</span>
+                <div style="display:flex;align-items:center;gap:7px">
+                  <span style="width:22px;height:22px;border-radius:99px;background:{{ p.reqBg }};color:{{ p.reqFg }};display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700">{{ p.reqInitials }}</span>
+                  <div style="display:flex;flex-direction:column">
+                    <span style="font-size:12.5px;font-weight:600;color:#334155">{{ p.requester }}</span>
+                    <span style="font-size:10.5px;color:#94A3B8">{{ p.requesterRole }}</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#94A3B8">Entrega</span>
+                <span style="font-size:12.5px;font-weight:600;color:{{ p.dueFg }}">{{ p.dueLabel }}</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <span style="font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#94A3B8">Microtarefas</span>
+                <span style="font-size:12.5px;font-weight:600;color:#334155">{{ p.taskSummary }}</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline">
+                <span style="font-size:11.5px;color:#64748B">Progresso</span>
+                <span style="font-size:12px;font-weight:700;color:{{ p.barColor }}">{{ p.progress }}%</span>
+              </div>
+              <div style="height:8px;border-radius:99px;background:#F1F5F9;overflow:hidden">
+                <div style="height:100%;border-radius:99px;background:{{ p.barColor }};width:{{ p.pct }};transition:width .4s ease"></div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;border-top:1px solid #F1F5F9">
+              <div style="display:flex;align-items:center">
+                <sc-for list="{{ p.team }}" as="m" hint-placeholder-count="4">
+                  <span title="{{ m.name }}" style="width:26px;height:26px;border-radius:99px;background:{{ m.bg }};color:{{ m.fg }};border:2px solid #FFFFFF;margin-left:-7px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700">{{ m.initials }}</span>
+                </sc-for>
+              </div>
+              <sc-if value="{{ p.hasAlert }}" hint-placeholder-val="{{ false }}">
+                <span style="font-size:11px;font-weight:600;color:#DC2626;background:#FEF2F2;border-radius:6px;padding:3px 9px">{{ p.alertLabel }}</span>
+              </sc-if>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showDetail }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <button onClick="{{ goProjects }}" style="align-self:flex-start;background:transparent;border:0;padding:0;font-size:12.5px;font-weight:600;color:#64748B;cursor:pointer" style-hover="color:#0F172A">‹ Todos os projetos</button>
+        <div style="display:flex;gap:8px">
+          <button onClick="{{ addMicroTask }}" style="padding:8px 15px;border:0;border-radius:9px;background:#0F172A;color:#FFFFFF;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="background:#1E293B">+ Microtarefa</button>
+          <button onClick="{{ editProject }}" style="padding:8px 15px;border:1px solid #E2E8F0;border-radius:9px;background:#FFFFFF;color:#475569;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="border-color:#CBD5E1">✎ Editar projeto</button>
+          <button onClick="{{ deleteProject }}" style="padding:8px 15px;border:1px solid #FECACA;border-radius:9px;background:#FFFFFF;color:#DC2626;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="background:#FEF2F2">Excluir</button>
+        </div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:24px 26px;display:flex;flex-direction:column;gap:22px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:32px;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;gap:8px;min-width:320px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#64748B">{{ cur.code }} · Projeto macro</span>
+              <span style="padding:3px 9px;border-radius:99px;background:{{ cur.stBg }};color:{{ cur.stFg }};font-size:11px;font-weight:600">{{ cur.stLabel }}</span>
+              <span style="padding:3px 9px;border-radius:99px;background:{{ cur.teamBg }};color:{{ cur.teamFg }};font-size:11px;font-weight:600">{{ cur.teamName }}</span>
+            </div>
+            <h1 style="margin:0;font-size:30px;line-height:1.15;font-weight:700;letter-spacing:-.02em;text-wrap:pretty">{{ cur.name }}</h1>
+            <p style="margin:0;font-size:13.5px;color:#64748B;max-width:62ch;text-wrap:pretty">{{ cur.description }}</p>
+          </div>
+          <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8">Requerente</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="width:30px;height:30px;border-radius:99px;background:{{ cur.reqBg }};color:{{ cur.reqFg }};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">{{ cur.reqInitials }}</span>
+                <div style="display:flex;flex-direction:column">
+                  <span style="font-size:13px;font-weight:600">{{ cur.requester }}</span>
+                  <span style="font-size:11px;color:#94A3B8">{{ cur.requesterRole }}</span>
+                </div>
+              </div>
+            </div>
+            <div style="width:1px;align-self:stretch;background:#E2E8F0"></div>
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8">Prazo final</span>
+              <span style="font-size:16px;font-weight:600">{{ cur.dueFull }}</span>
+              <span style="font-size:12px;font-weight:500;color:{{ cur.dueFg }}">{{ cur.dueRelative }}</span>
+            </div>
+            <div style="width:1px;align-self:stretch;background:#E2E8F0"></div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8">Equipe</span>
+              <div style="display:flex;align-items:center">
+                <sc-for list="{{ cur.team }}" as="m" hint-placeholder-count="4">
+                  <span title="{{ m.name }}" style="width:32px;height:32px;border-radius:99px;background:{{ m.bg }};color:{{ m.fg }};border:2px solid #FFFFFF;margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600">{{ m.initials }}</span>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <span style="font-size:12.5px;font-weight:600;color:#334155">Progresso geral do projeto</span>
+            <span style="font-size:13px;font-weight:700;color:#16A34A">{{ overall }}%</span>
+          </div>
+          <div style="height:10px;border-radius:99px;background:#F1F5F9;overflow:hidden">
+            <div style="height:100%;border-radius:99px;background:linear-gradient(90deg,#22C55E,#16A34A);width:{{ overallW }};transition:width .4s ease"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:2px">
+          <div style="position:relative;display:flex;align-items:center;flex:1 1 240px;max-width:320px">
+            <span style="position:absolute;left:12px;font-size:13px;color:#94A3B8">⌕</span>
+            <input value="{{ q }}" onChange="{{ onSearch }}" placeholder="Buscar microtarefa..." style="width:100%;padding:9px 12px 9px 30px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none" style-focus="border-color:#93C5FD;box-shadow:0 0 0 3px rgba(37,99,235,.12)" />
+          </div>
+          <select value="{{ owner }}" onChange="{{ onOwner }}" style="padding:9px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;color:#334155;outline:none;cursor:pointer">
+            <sc-for list="{{ ownerOptions }}" as="o" hint-placeholder-count="4">
+              <option value="{{ o }}">{{ o }}</option>
+            </sc-for>
+          </select>
+          <select value="{{ requester }}" onChange="{{ onRequester }}" style="padding:9px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;color:#334155;outline:none;cursor:pointer">
+            <sc-for list="{{ requesterOptions }}" as="r" hint-placeholder-count="3">
+              <option value="{{ r }}">{{ r }}</option>
+            </sc-for>
+          </select>
+          <select value="{{ status }}" onChange="{{ onStatus }}" style="padding:9px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;color:#334155;outline:none;cursor:pointer">
+            <sc-for list="{{ statusOptions }}" as="s" hint-placeholder-count="5">
+              <option value="{{ s }}">{{ s }}</option>
+            </sc-for>
+          </select>
+          <button onClick="{{ onLate }}" style="padding:9px 13px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid {{ lateBorder }};background:{{ lateBg }};color:{{ lateFg }}">Somente atrasadas</button>
+          <div style="flex:1"></div>
+          <span style="font-size:12.5px;color:#64748B">{{ visibleCount }} de {{ totalTasks }} exibidas</span>
+          <div style="display:flex;background:#F1F5F9;border-radius:9px;padding:3px;gap:3px">
+            <button onClick="{{ setKanban }}" style="padding:6px 14px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ kanbanBg }};color:{{ kanbanFg }};box-shadow:{{ kanbanShadow }}">Kanban</button>
+            <button onClick="{{ setTable }}" style="padding:6px 14px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ tableBg }};color:{{ tableFg }};box-shadow:{{ tableShadow }}">Tabela</button>
+            <button onClick="{{ setGantt }}" style="padding:6px 14px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ ganttBg }};color:{{ ganttFg }};box-shadow:{{ ganttShadow }}">Gantt</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+        <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+          <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:18px 20px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden">
+            <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:{{ k.color }}"></div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+              <span style="font-size:12.5px;font-weight:600;color:#64748B">{{ k.label }}</span>
+              <span style="width:28px;height:28px;border-radius:8px;background:{{ k.bg }};color:{{ k.color }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">{{ k.icon }}</span>
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:8px">
+              <span style="font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1">{{ k.value }}</span>
+              <span style="font-size:12px;color:#94A3B8;padding-bottom:4px">{{ k.unit }}</span>
+            </div>
+            <span style="font-size:12px;color:{{ k.subColor }}">{{ k.sub }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ isKanban }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(260px,1fr));gap:16px;align-items:start">
+          <sc-for list="{{ columns }}" as="col" hint-placeholder-count="4">
+            <div onDragOver="{{ col.over }}" onDrop="{{ col.drop }}" style="background:#F1F5F9;border:1px solid #E2E8F0;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:180px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:2px 4px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="width:8px;height:8px;border-radius:99px;background:{{ col.color }}"></span>
+                  <span style="font-size:13px;font-weight:600;color:#334155">{{ col.label }}</span>
+                </div>
+                <span style="font-size:11.5px;font-weight:600;color:#64748B;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:99px;padding:1px 8px">{{ col.count }}</span>
+              </div>
+              <sc-for list="{{ col.tasks }}" as="t" hint-placeholder-count="2">
+                <div draggable="true" onDragStart="{{ t.drag }}" onClick="{{ t.openEdit }}" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:11px;box-shadow:0 1px 2px rgba(15,23,42,.04);cursor:grab;transition:box-shadow .15s ease,transform .15s ease" style-hover="box-shadow:0 6px 18px rgba(15,23,42,.09);transform:translateY(-1px)">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+                    <span style="font-size:13.5px;font-weight:600;line-height:1.35;text-wrap:pretty">{{ t.name }}</span>
+                    <span style="font-size:10.5px;font-weight:600;color:#94A3B8;white-space:nowrap;padding-top:2px">{{ t.code }}</span>
+                  </div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <span style="font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px;background:{{ t.badgeBg }};color:{{ t.badgeFg }}">{{ t.status }}</span>
+                    <span style="font-size:10.5px;font-weight:500;padding:3px 8px;border-radius:6px;background:#F8FAFC;border:1px solid #E2E8F0;color:#64748B">{{ t.tag }}</span>
+                    <span style="font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px;background:{{ t.teamBg }};color:{{ t.teamFg }}">{{ t.team }}</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:#64748B;background:#F8FAFC;border-radius:7px;padding:5px 8px">
+                    <span style="font-weight:600;color:#94A3B8">Solicitado por</span>
+                    <span style="font-weight:600;color:#475569">{{ t.requester }}</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:5px">
+                    <div style="display:flex;justify-content:space-between;font-size:11px;color:#64748B">
+                      <span>Progresso</span>
+                      <span style="font-weight:600;color:#334155">{{ t.progress }}%</span>
+                    </div>
+                    <div style="height:6px;border-radius:99px;background:#F1F5F9;overflow:hidden">
+                      <div style="height:100%;border-radius:99px;background:{{ t.badgeFg }};width:{{ t.pct }};transition:width .4s ease"></div>
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:11px;border-top:1px solid #F1F5F9">
+                    <div style="display:flex;align-items:center;gap:7px">
+                      <span style="width:24px;height:24px;border-radius:99px;background:{{ t.avBg }};color:{{ t.avFg }};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">{{ t.initials }}</span>
+                      <span style="font-size:11.5px;color:#475569;font-weight:500">{{ t.owner }}</span>
+                    </div>
+                    <span style="font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;background:{{ t.dueBg }};color:{{ t.dueFg }};white-space:nowrap">{{ t.dueLabel }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+        <span style="font-size:11.5px;color:#94A3B8;text-align:center">Arraste um cartão para outra coluna para mudar o status · clique para editar</span>
+      </sc-if>
+
+      <sc-if value="{{ isTable }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);overflow:hidden">
+          <div style="display:grid;grid-template-columns:minmax(260px,2.2fr) 1.1fr 1.1fr 1.1fr 1.2fr .9fr;gap:16px;padding:12px 20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8">
+            <span>Microtarefa</span>
+            <span>Requerente</span>
+            <span>Responsável</span>
+            <span>Status</span>
+            <span>Progresso</span>
+            <span>Entrega</span>
+          </div>
+          <sc-for list="{{ rows }}" as="t" hint-placeholder-count="6">
+            <div onClick="{{ t.openEdit }}" style="display:grid;grid-template-columns:minmax(260px,2.2fr) 1.1fr 1.1fr 1.1fr 1.2fr .9fr;gap:16px;padding:13px 20px;border-bottom:1px solid #F1F5F9;align-items:center;cursor:pointer;transition:background .12s ease" style-hover="background:#F8FAFC">
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+                <span style="font-size:13.5px;font-weight:600;text-wrap:pretty">{{ t.name }}</span>
+                <span style="font-size:11px;color:#94A3B8">{{ t.code }} · {{ t.tag }} · {{ t.team }}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:7px;min-width:0">
+                <span style="width:24px;height:24px;border-radius:99px;background:{{ t.reqBg }};color:{{ t.reqFg }};display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;flex:none">{{ t.reqInitials }}</span>
+                <span style="font-size:12px;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.requester }}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:7px;min-width:0">
+                <span style="width:24px;height:24px;border-radius:99px;background:{{ t.avBg }};color:{{ t.avFg }};display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;flex:none">{{ t.initials }}</span>
+                <span style="font-size:12px;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.owner }}</span>
+              </div>
+              <div>
+                <span style="font-size:10.5px;font-weight:600;padding:4px 9px;border-radius:6px;background:{{ t.badgeBg }};color:{{ t.badgeFg }};white-space:nowrap">{{ t.status }}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="flex:1;height:6px;border-radius:99px;background:#F1F5F9;overflow:hidden">
+                  <div style="height:100%;border-radius:99px;background:{{ t.badgeFg }};width:{{ t.pct }};transition:width .4s ease"></div>
+                </div>
+                <span style="font-size:11.5px;font-weight:600;color:#475569;width:34px;text-align:right">{{ t.progress }}%</span>
+              </div>
+              <span style="font-size:11.5px;font-weight:600;color:{{ t.dueFg }}">{{ t.dueLabel }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isGantt }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);overflow:hidden">
+          <div style="display:grid;grid-template-columns:280px 1fr">
+            <div style="padding:12px 20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8">Microtarefa</div>
+            <div style="position:relative;height:40px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;border-left:1px solid #E2E8F0;overflow:hidden">
+              <sc-for list="{{ ganttTicks }}" as="tk" hint-placeholder-count="5">
+                <div style="position:absolute;top:0;bottom:0;left:{{ tk.left }};border-left:1px solid #E2E8F0;display:flex;align-items:center">
+                  <span style="font-size:10.5px;font-weight:600;color:#94A3B8;padding-left:6px;white-space:nowrap">{{ tk.label }}</span>
+                </div>
+              </sc-for>
+              <sc-if value="{{ todayVisible }}" hint-placeholder-val="{{ true }}">
+                <div style="position:absolute;top:0;bottom:0;left:{{ todayLeft }};border-left:2px solid #DC2626;display:flex;align-items:flex-start">
+                  <span style="font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#FFFFFF;background:#DC2626;border-radius:0 4px 4px 0;padding:2px 6px;margin-top:4px">Hoje</span>
+                </div>
+              </sc-if>
+            </div>
+            <sc-for list="{{ ganttRows }}" as="g" hint-placeholder-count="6">
+              <div onClick="{{ g.openEdit }}" style="padding:11px 20px;border-bottom:1px solid #F1F5F9;display:flex;flex-direction:column;gap:3px;min-width:0;justify-content:center;cursor:pointer" style-hover="background:#F8FAFC">
+                <span style="font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ g.name }}</span>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span style="width:18px;height:18px;border-radius:99px;background:{{ g.avBg }};color:{{ g.avFg }};display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;flex:none">{{ g.initials }}</span>
+                  <span style="font-size:11px;color:#94A3B8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ g.owner }} · {{ g.status }}</span>
+                </div>
+              </div>
+              <div style="position:relative;border-bottom:1px solid #F1F5F9;border-left:1px solid #E2E8F0;min-height:52px;overflow:hidden">
+                <sc-for list="{{ ganttTicks }}" as="tk" hint-placeholder-count="5">
+                  <div style="position:absolute;top:0;bottom:0;left:{{ tk.left }};border-left:1px solid #F1F5F9"></div>
+                </sc-for>
+                <sc-if value="{{ todayVisible }}" hint-placeholder-val="{{ true }}">
+                  <div style="position:absolute;top:0;bottom:0;left:{{ todayLeft }};border-left:2px solid rgba(220,38,38,.35)"></div>
+                </sc-if>
+                <div title="{{ g.tooltip }}" style="position:absolute;top:50%;transform:translateY(-50%);left:{{ g.left }};width:{{ g.width }};height:20px;border-radius:6px;background:{{ g.barBg }};border:1px solid {{ g.barFg }};overflow:hidden;cursor:default">
+                  <div style="height:100%;background:{{ g.barFg }};opacity:.85;width:{{ g.fill }};border-radius:5px 0 0 5px"></div>
+                </div>
+                <span style="position:absolute;top:50%;transform:translateY(-50%);left:{{ g.labelLeft }};font-size:10.5px;font-weight:600;color:{{ g.dueFg }};white-space:nowrap;padding-left:8px">{{ g.dueLabel }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:18px;padding:12px 20px;background:#F8FAFC;border-top:1px solid #E2E8F0;flex-wrap:wrap">
+            <sc-for list="{{ ganttLegend }}" as="l" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:7px">
+                <span style="width:18px;height:10px;border-radius:3px;background:{{ l.bg }};border:1px solid {{ l.fg }}"></span>
+                <span style="font-size:11px;color:#64748B">{{ l.label }}</span>
+              </div>
+            </sc-for>
+            <span style="font-size:11px;color:#94A3B8;margin-left:auto">Barra: da abertura à entrega · preenchimento = progresso · linha vermelha = hoje</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:48px;text-align:center;color:#94A3B8;font-size:13.5px;background:#FFFFFF;border:1px dashed #E2E8F0;border-radius:14px">Nenhuma microtarefa encontrada com os filtros atuais.</div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showLoose }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em">Tarefas avulsas</h1>
+          <p style="margin:0;font-size:13px;color:#64748B">Demandas pontuais que não pertencem a nenhum projeto macro. Clique numa linha para editar.</p>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <div style="position:relative;display:flex;align-items:center">
+            <span style="position:absolute;left:12px;font-size:13px;color:#94A3B8">⌕</span>
+            <input value="{{ looseQ }}" onChange="{{ onLooseSearch }}" placeholder="Buscar tarefa avulsa..." style="width:240px;padding:9px 12px 9px 30px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none" style-focus="border-color:#93C5FD;box-shadow:0 0 0 3px rgba(37,99,235,.12)" />
+          </div>
+          <select value="{{ looseStatus }}" onChange="{{ onLooseStatus }}" style="padding:9px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;color:#334155;outline:none;cursor:pointer">
+            <sc-for list="{{ statusOptions }}" as="s" hint-placeholder-count="5">
+              <option value="{{ s }}">{{ s }}</option>
+            </sc-for>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+        <sc-for list="{{ looseKpis }}" as="k" hint-placeholder-count="4">
+          <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:18px 20px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden">
+            <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:{{ k.color }}"></div>
+            <span style="font-size:12.5px;font-weight:600;color:#64748B">{{ k.label }}</span>
+            <div style="display:flex;align-items:flex-end;gap:8px">
+              <span style="font-size:30px;font-weight:700;letter-spacing:-.03em;line-height:1">{{ k.value }}</span>
+              <span style="font-size:12px;color:#94A3B8;padding-bottom:3px">{{ k.unit }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);overflow:hidden">
+        <div style="display:grid;grid-template-columns:minmax(240px,2fr) 1.1fr 1.1fr .8fr 1.1fr 1.1fr .9fr;gap:14px;padding:12px 20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8">
+          <span>Tarefa</span>
+          <span>Requerente</span>
+          <span>Responsável</span>
+          <span>Prioridade</span>
+          <span>Status</span>
+          <span>Progresso</span>
+          <span>Entrega</span>
+        </div>
+        <sc-for list="{{ looseRows }}" as="t" hint-placeholder-count="4">
+          <div onClick="{{ t.openEdit }}" style="display:grid;grid-template-columns:minmax(240px,2fr) 1.1fr 1.1fr .8fr 1.1fr 1.1fr .9fr;gap:14px;padding:13px 20px;border-bottom:1px solid #F1F5F9;align-items:center;cursor:pointer;transition:background .12s ease" style-hover="background:#F8FAFC">
+            <div style="display:flex;flex-direction:column;gap:3px;min-width:0">
+              <span style="font-size:13.5px;font-weight:600;text-wrap:pretty">{{ t.name }}</span>
+              <div style="display:flex;align-items:center;gap:7px">
+                <span style="font-size:11px;color:#94A3B8">{{ t.code }} · aberta em {{ t.openedLabel }}</span>
+                <span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:99px;background:{{ t.teamBg }};color:{{ t.teamFg }}">{{ t.team }}</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;min-width:0">
+              <span style="width:24px;height:24px;border-radius:99px;background:{{ t.reqBg }};color:{{ t.reqFg }};display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;flex:none">{{ t.reqInitials }}</span>
+              <span style="font-size:12px;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.requester }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;min-width:0">
+              <span style="width:24px;height:24px;border-radius:99px;background:{{ t.avBg }};color:{{ t.avFg }};display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;flex:none">{{ t.initials }}</span>
+              <span style="font-size:12px;color:#475569;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.owner }}</span>
+            </div>
+            <span style="font-size:10.5px;font-weight:600;padding:4px 9px;border-radius:6px;background:{{ t.prioBg }};color:{{ t.prioFg }};justify-self:start">{{ t.priority }}</span>
+            <span style="font-size:10.5px;font-weight:600;padding:4px 9px;border-radius:6px;background:{{ t.badgeBg }};color:{{ t.badgeFg }};justify-self:start;white-space:nowrap">{{ t.status }}</span>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="flex:1;height:6px;border-radius:99px;background:#F1F5F9;overflow:hidden">
+                <div style="height:100%;border-radius:99px;background:{{ t.badgeFg }};width:{{ t.pct }};transition:width .4s ease"></div>
+              </div>
+              <span style="font-size:11.5px;font-weight:600;color:#475569;width:34px;text-align:right">{{ t.progress }}%</span>
+            </div>
+            <span style="font-size:11.5px;font-weight:600;color:{{ t.dueFg }}">{{ t.dueLabel }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ looseEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:48px;text-align:center;color:#94A3B8;font-size:13.5px;background:#FFFFFF;border:1px dashed #E2E8F0;border-radius:14px">Nenhuma tarefa avulsa. Use "+ Nova demanda" para criar a primeira.</div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showCal }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em">Calendário de entregas</h1>
+          <p style="margin:0;font-size:13px;color:#64748B">Todas as microtarefas de todos os projetos e tarefas avulsas, organizadas pela data de entrega.</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button onClick="{{ calPrev }}" style="width:34px;height:34px;border:1px solid #E2E8F0;border-radius:9px;background:#FFFFFF;color:#475569;font-size:15px;cursor:pointer" style-hover="border-color:#CBD5E1;background:#F8FAFC">‹</button>
+          <span style="font-size:15px;font-weight:700;letter-spacing:-.01em;min-width:150px;text-align:center;text-transform:capitalize">{{ calLabel }}</span>
+          <button onClick="{{ calNext }}" style="width:34px;height:34px;border:1px solid #E2E8F0;border-radius:9px;background:#FFFFFF;color:#475569;font-size:15px;cursor:pointer" style-hover="border-color:#CBD5E1;background:#F8FAFC">›</button>
+          <button onClick="{{ calToday }}" style="padding:8px 14px;border:1px solid #E2E8F0;border-radius:9px;background:#FFFFFF;color:#475569;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="border-color:#CBD5E1;background:#F8FAFC">Hoje</button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+        <sc-for list="{{ calLegend }}" as="l" hint-placeholder-count="5">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="width:10px;height:10px;border-radius:3px;background:{{ l.color }}"></span>
+            <span style="font-size:11.5px;color:#64748B">{{ l.label }}</span>
+          </div>
+        </sc-for>
+        <span style="font-size:11.5px;color:#94A3B8;margin-left:auto">{{ calCount }} entregas no mês</span>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);overflow:hidden">
+        <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:#F8FAFC;border-bottom:1px solid #E2E8F0">
+          <sc-for list="{{ calWeekdays }}" as="w" hint-placeholder-count="7">
+            <span style="padding:10px 12px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8">{{ w }}</span>
+          </sc-for>
+        </div>
+        <sc-for list="{{ calWeeks }}" as="wk" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-bottom:1px solid #F1F5F9">
+            <sc-for list="{{ wk.days }}" as="d" hint-placeholder-count="7">
+              <div style="min-height:118px;padding:8px;border-right:1px solid #F1F5F9;background:{{ d.bg }};display:flex;flex-direction:column;gap:5px;min-width:0">
+                <span style="align-self:flex-start;font-size:11.5px;font-weight:{{ d.numWeight }};color:{{ d.numFg }};background:{{ d.numBg }};border-radius:99px;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;padding:0 4px">{{ d.num }}</span>
+                <sc-for list="{{ d.items }}" as="it" hint-placeholder-count="0">
+                  <div title="{{ it.tooltip }}" onClick="{{ it.open }}" style="display:flex;align-items:center;gap:5px;background:{{ it.bg }};border-radius:6px;padding:3px 7px;cursor:pointer;min-width:0" style-hover="filter:brightness(.96)">
+                    <span style="width:6px;height:6px;border-radius:99px;background:{{ it.fg }};flex:none"></span>
+                    <span style="font-size:10.5px;font-weight:600;color:{{ it.fg }};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ it.label }}</span>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ d.hasMore }}" hint-placeholder-val="{{ false }}">
+                  <span style="font-size:10.5px;font-weight:600;color:#94A3B8;padding-left:2px">+ {{ d.more }} mais</span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showPerf }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em">Gestão de desempenho</h1>
+          <p style="margin:0;font-size:13px;color:#64748B">Calculado automaticamente a partir das tarefas registradas no sistema — nota por prazo, velocidade e volume.</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:12px;color:#94A3B8;font-weight:600">Mês de referência</span>
+          <select value="{{ perfMonth }}" onChange="{{ onPerfMonth }}" style="padding:9px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;color:#334155;outline:none;cursor:pointer">
+            <sc-for list="{{ monthOptions }}" as="m" hint-placeholder-count="3">
+              <option value="{{ m }}">{{ m }}</option>
+            </sc-for>
+          </select>
+        </div>
+      </div>
+
+      <sc-if value="{{ perfEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:56px 24px;text-align:center;background:#FFFFFF;border:1px dashed #CBD5E1;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:10px">
+          <span style="font-size:14.5px;font-weight:700;color:#334155">Sem dados de desempenho neste mês</span>
+          <span style="font-size:12.5px;color:#94A3B8;max-width:52ch;text-wrap:pretty">As métricas aparecem automaticamente conforme tarefas são atribuídas e concluídas pelos colaboradores cadastrados.</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ perfHasData }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+          <sc-for list="{{ perfKpis }}" as="k" hint-placeholder-count="4">
+            <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:18px 20px;display:flex;flex-direction:column;gap:11px;position:relative;overflow:hidden">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:{{ k.color }}"></div>
+              <span style="font-size:12.5px;font-weight:600;color:#64748B">{{ k.label }}</span>
+              <div style="display:flex;align-items:flex-end;gap:8px">
+                <span style="font-size:30px;font-weight:700;letter-spacing:-.03em;line-height:1;color:{{ k.valueColor }}">{{ k.value }}</span>
+                <span style="font-size:12px;color:#94A3B8;padding-bottom:3px">{{ k.unit }}</span>
+              </div>
+              <span style="font-size:12px;color:{{ k.subColor }}">{{ k.sub }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:18px 22px;display:flex;align-items:center;gap:26px;flex-wrap:wrap">
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8">Nota média da equipe</span>
+            <div style="display:flex;align-items:baseline;gap:6px">
+              <span style="font-size:28px;font-weight:700;letter-spacing:-.03em">{{ teamAvg }}</span>
+              <span style="font-size:13px;color:#94A3B8">/ 10</span>
+            </div>
+          </div>
+          <div style="width:1px;align-self:stretch;background:#E2E8F0"></div>
+          <div style="flex:1;min-width:220px;display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:#64748B">
+              <span>{{ aboveCount }} acima ou na média</span>
+              <span style="color:#DC2626;font-weight:600">{{ belowCount }} abaixo da média — feedback necessário</span>
+            </div>
+            <div style="display:flex;height:8px;border-radius:99px;overflow:hidden;background:#F1F5F9">
+              <div style="background:#16A34A;width:{{ aboveW }};transition:width .4s ease"></div>
+              <div style="background:#DC2626;width:{{ belowW }};transition:width .4s ease"></div>
+            </div>
+          </div>
+          <div style="width:1px;align-self:stretch;background:#E2E8F0"></div>
+          <div style="display:flex;flex-direction:column;gap:3px;max-width:280px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8">Critério da nota</span>
+            <span style="font-size:12px;color:#64748B;text-wrap:pretty">50% entregas no prazo · 30% velocidade vs. média · 20% volume entregue.</span>
+          </div>
+        </div>
+
+        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #E2E8F0">
+            <span style="font-size:14px;font-weight:700;letter-spacing:-.01em">Ranking de produtividade</span>
+            <span style="font-size:11.5px;color:#94A3B8">{{ perfMonth }}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:40px minmax(190px,1.5fr) .8fr .8fr 1.2fr .8fr .9fr .9fr 1.3fr;gap:12px;padding:11px 20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8">
+            <span>#</span>
+            <span>Colaborador</span>
+            <span>Atribuídas</span>
+            <span>Concluídas</span>
+            <span>Conclusão</span>
+            <span>Projetos</span>
+            <span>Tempo médio</span>
+            <span>Atrasadas</span>
+            <span>Nota</span>
+          </div>
+          <sc-for list="{{ ranking }}" as="p" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:40px minmax(190px,1.5fr) .8fr .8fr 1.2fr .8fr .9fr .9fr 1.3fr;gap:12px;padding:14px 20px;border-bottom:1px solid #F1F5F9;align-items:center;background:{{ p.rowBg }};transition:background .12s ease">
+              <span style="font-size:13px;font-weight:700;color:{{ p.rankColor }}">{{ p.rank }}</span>
+              <div style="display:flex;align-items:center;gap:10px;min-width:0">
+                <span style="width:32px;height:32px;border-radius:99px;background:{{ p.bg }};color:{{ p.fg }};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none">{{ p.initials }}</span>
+                <div style="display:flex;flex-direction:column;min-width:0">
+                  <div style="display:flex;align-items:center;gap:7px">
+                    <span style="font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.name }}</span>
+                    <sc-if value="{{ p.below }}" hint-placeholder-val="{{ false }}">
+                      <span style="font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FEE2E2;color:#B91C1C;white-space:nowrap">Feedback</span>
+                    </sc-if>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <span style="font-size:11px;color:#94A3B8">{{ p.role }}</span>
+                    <span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:99px;background:{{ p.teamBg }};color:{{ p.teamFg }}">{{ p.team }}</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column">
+                <span style="font-size:13px;font-weight:700;color:#334155">{{ p.assigned }}</span>
+                <span style="font-size:10.5px;color:#94A3B8">{{ p.openTasks }} em aberto</span>
+              </div>
+              <span style="font-size:13px;font-weight:700;color:#16A34A">{{ p.delivered }}</span>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="flex:1;height:6px;border-radius:99px;background:#F1F5F9;overflow:hidden">
+                  <div style="height:100%;border-radius:99px;background:{{ p.completionColor }};width:{{ p.completionW }};transition:width .4s ease"></div>
+                </div>
+                <span style="font-size:11.5px;font-weight:600;color:{{ p.completionColor }};width:32px;text-align:right">{{ p.completion }}</span>
+              </div>
+              <span style="font-size:13px;font-weight:600;color:#334155">{{ p.projects }}</span>
+              <span style="font-size:13px;font-weight:600;color:{{ p.speedColor }}">{{ p.avgDays }} dias</span>
+              <span style="font-size:13px;font-weight:700;color:{{ p.lateColor }}">{{ p.late }}</span>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div style="flex:1;height:7px;border-radius:99px;background:#F1F5F9;overflow:hidden">
+                  <div style="height:100%;border-radius:99px;background:{{ p.scoreColor }};width:{{ p.scoreW }};transition:width .4s ease"></div>
+                </div>
+                <span style="font-size:13px;font-weight:700;color:{{ p.scoreColor }};width:34px;text-align:right">{{ p.score }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">
+          <div style="background:#FFFFFF;border:1px solid #FECACA;border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;gap:9px">
+              <span style="width:8px;height:8px;border-radius:99px;background:#DC2626"></span>
+              <span style="font-size:13.5px;font-weight:700">Pontos de atenção do mês</span>
+            </div>
+            <sc-for list="{{ attention }}" as="a" hint-placeholder-count="2">
+              <div style="display:flex;align-items:flex-start;gap:11px;padding-bottom:11px;border-bottom:1px solid #F1F5F9">
+                <span style="width:28px;height:28px;border-radius:99px;background:{{ a.bg }};color:{{ a.fg }};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex:none">{{ a.initials }}</span>
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:12.5px;font-weight:600;color:#334155">{{ a.name }}</span>
+                  <span style="font-size:12px;color:#64748B;text-wrap:pretty">{{ a.note }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;padding:20px 22px;display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;gap:9px">
+              <span style="width:8px;height:8px;border-radius:99px;background:#16A34A"></span>
+              <span style="font-size:13.5px;font-weight:700">Destaques do mês</span>
+            </div>
+            <sc-for list="{{ highlights }}" as="a" hint-placeholder-count="2">
+              <div style="display:flex;align-items:flex-start;gap:11px;padding-bottom:11px;border-bottom:1px solid #F1F5F9">
+                <span style="width:28px;height:28px;border-radius:99px;background:{{ a.bg }};color:{{ a.fg }};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex:none">{{ a.initials }}</span>
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:12.5px;font-weight:600;color:#334155">{{ a.name }}</span>
+                  <span style="font-size:12px;color:#64748B;text-wrap:pretty">{{ a.note }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showReg }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em">Cadastros</h1>
+        <p style="margin:0;font-size:13px;color:#64748B">Gerencie colaboradores, requerentes e equipes. Tudo fica salvo neste navegador.</p>
+      </div>
+
+      <sc-if value="{{ hasRegError }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:10px 14px;border-radius:9px;background:#FEF2F2;border:1px solid #FECACA;color:#B91C1C;font-size:12.5px;font-weight:500;align-self:flex-start">{{ regError }}</div>
+      </sc-if>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;align-items:start">
+        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:20px 22px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:14px;font-weight:700">Colaboradores</span>
+            <span style="font-size:11.5px;font-weight:600;color:#64748B;background:#F1F5F9;border-radius:99px;padding:2px 9px">{{ peopleCount }}</span>
+          </div>
+          <sc-for list="{{ regPeople }}" as="m" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:10px;padding-bottom:11px;border-bottom:1px solid #F1F5F9">
+              <span style="width:30px;height:30px;border-radius:99px;background:{{ m.bg }};color:{{ m.fg }};display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;flex:none">{{ m.initials }}</span>
+              <div style="display:flex;flex-direction:column;min-width:0;flex:1">
+                <span style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ m.name }}</span>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <span style="font-size:11px;color:#94A3B8">{{ m.role }}</span>
+                  <span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:99px;background:{{ m.teamBg }};color:{{ m.teamFg }}">{{ m.team }}</span>
+                </div>
+              </div>
+              <button onClick="{{ m.remove }}" title="Remover" style="width:26px;height:26px;border:0;border-radius:7px;background:transparent;color:#CBD5E1;font-size:12px;cursor:pointer;flex:none" style-hover="background:#FEF2F2;color:#DC2626">✕</button>
+            </div>
+          </sc-for>
+          <div style="display:flex;flex-direction:column;gap:8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#94A3B8">Adicionar colaborador</span>
+            <input value="{{ pName }}" onChange="{{ onPName }}" placeholder="Nome completo" style="padding:8px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:12.5px;outline:none;background:#FFFFFF" style-focus="border-color:#93C5FD" />
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <input value="{{ pRole }}" onChange="{{ onPRole }}" placeholder="Função (ex.: Design)" style="padding:8px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:12.5px;outline:none;background:#FFFFFF" style-focus="border-color:#93C5FD" />
+              <select value="{{ pTeam }}" onChange="{{ onPTeam }}" style="padding:8px 9px;border:1px solid #E2E8F0;border-radius:8px;font-size:12px;background:#FFFFFF;outline:none;cursor:pointer">
+                <sc-for list="{{ teamList }}" as="tm" hint-placeholder-count="4">
+                  <option value="{{ tm }}">{{ tm }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <button onClick="{{ addPerson }}" style="padding:8px;border:0;border-radius:8px;background:#0F172A;color:#FFFFFF;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="background:#1E293B">Adicionar</button>
+          </div>
+        </div>
+
+        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:20px 22px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:14px;font-weight:700">Requerentes</span>
+            <span style="font-size:11.5px;font-weight:600;color:#64748B;background:#F1F5F9;border-radius:99px;padding:2px 9px">{{ reqCount }}</span>
+          </div>
+          <sc-for list="{{ regReqs }}" as="m" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:10px;padding-bottom:11px;border-bottom:1px solid #F1F5F9">
+              <span style="width:30px;height:30px;border-radius:99px;background:{{ m.bg }};color:{{ m.fg }};display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;flex:none">{{ m.initials }}</span>
+              <div style="display:flex;flex-direction:column;min-width:0;flex:1">
+                <span style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ m.name }}</span>
+                <span style="font-size:11px;color:#94A3B8">{{ m.role }}</span>
+              </div>
+              <button onClick="{{ m.remove }}" title="Remover" style="width:26px;height:26px;border:0;border-radius:7px;background:transparent;color:#CBD5E1;font-size:12px;cursor:pointer;flex:none" style-hover="background:#FEF2F2;color:#DC2626">✕</button>
+            </div>
+          </sc-for>
+          <div style="display:flex;flex-direction:column;gap:8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#94A3B8">Adicionar requerente</span>
+            <input value="{{ rName }}" onChange="{{ onRName }}" placeholder="Nome" style="padding:8px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:12.5px;outline:none;background:#FFFFFF" style-focus="border-color:#93C5FD" />
+            <input value="{{ rRole }}" onChange="{{ onRRole }}" placeholder="Cargo / área (ex.: Diretor Comercial)" style="padding:8px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:12.5px;outline:none;background:#FFFFFF" style-focus="border-color:#93C5FD" />
+            <button onClick="{{ addRequester }}" style="padding:8px;border:0;border-radius:8px;background:#0F172A;color:#FFFFFF;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="background:#1E293B">Adicionar</button>
+          </div>
+        </div>
+
+        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:20px 22px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:14px;font-weight:700">Equipes</span>
+            <span style="font-size:11.5px;font-weight:600;color:#64748B;background:#F1F5F9;border-radius:99px;padding:2px 9px">{{ teamCount }}</span>
+          </div>
+          <sc-for list="{{ regTeams }}" as="m" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:10px;padding-bottom:11px;border-bottom:1px solid #F1F5F9">
+              <span style="width:10px;height:10px;border-radius:99px;background:{{ m.dot }};flex:none"></span>
+              <div style="display:flex;flex-direction:column;min-width:0;flex:1">
+                <span style="font-size:13px;font-weight:600">{{ m.name }}</span>
+                <span style="font-size:11px;color:#94A3B8">{{ m.count }} colaborador(es)</span>
+              </div>
+              <button onClick="{{ m.remove }}" title="Remover" style="width:26px;height:26px;border:0;border-radius:7px;background:transparent;color:#CBD5E1;font-size:12px;cursor:pointer;flex:none" style-hover="background:#FEF2F2;color:#DC2626">✕</button>
+            </div>
+          </sc-for>
+          <div style="display:flex;flex-direction:column;gap:8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#94A3B8">Adicionar equipe</span>
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
+              <input value="{{ tmName }}" onChange="{{ onTmName }}" placeholder="Nome da equipe" style="padding:8px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:12.5px;outline:none;background:#FFFFFF" style-focus="border-color:#93C5FD" />
+              <button onClick="{{ addTeam }}" style="padding:8px 16px;border:0;border-radius:8px;background:#0F172A;color:#FFFFFF;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="background:#1E293B">Adicionar</button>
+            </div>
+          </div>
+          <span style="font-size:11px;color:#94A3B8;text-wrap:pretty">Equipes com colaboradores vinculados não podem ser removidas.</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultView&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;kanban&quot;,&quot;table&quot;,&quot;gantt&quot;],&quot;default&quot;:&quot;table&quot;,&quot;tsType&quot;:&quot;\&quot;kanban\&quot; | \&quot;table\&quot; | \&quot;gantt\&quot;&quot;,&quot;section&quot;:&quot;Board&quot;}}">
+const LS_KEY = 'central-demandas-v1';
+const DAY = 86400000;
+const MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+const MONTHS_FULL = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+
+const STATUS = {
+  backlog:   { label: 'Backlog',              fg: '#64748B', bg: '#F1F5F9', dot: '#94A3B8' },
+  dev:       { label: 'Em Desenvolvimento',   fg: '#2563EB', bg: '#EFF6FF', dot: '#3B82F6' },
+  aprovacao: { label: 'Aguardando Aprovação', fg: '#D97706', bg: '#FFFBEB', dot: '#F59E0B' },
+  concluido: { label: 'Concluído',            fg: '#16A34A', bg: '#F0FDF4', dot: '#22C55E' }
+};
+const PRIORITY = {
+  Alta:  { fg: '#DC2626', bg: '#FEF2F2' },
+  Média: { fg: '#D97706', bg: '#FFFBEB' },
+  Baixa: { fg: '#64748B', bg: '#F1F5F9' }
+};
+const PALETTE = [
+  { bg: '#EDE9FE', fg: '#6D28D9', dot: '#8B5CF6' },
+  { bg: '#E0F2FE', fg: '#0369A1', dot: '#0EA5E9' },
+  { bg: '#DCFCE7', fg: '#15803D', dot: '#22C55E' },
+  { bg: '#FFEDD5', fg: '#C2410C', dot: '#F97316' },
+  { bg: '#FCE7F3', fg: '#BE185D', dot: '#EC4899' },
+  { bg: '#DBEAFE', fg: '#1D4ED8', dot: '#3B82F6' },
+  { bg: '#FEF9C3', fg: '#A16207', dot: '#EAB308' },
+  { bg: '#F1F5F9', fg: '#475569', dot: '#94A3B8' }
+];
+
+function todayZero() { const d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+function isoOf(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function round1(n) { return Math.round(n * 10) / 10; }
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function initials(name) { return String(name || '?').split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase(); }
+function fmt(d) { return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
+function fmtFull(d) { return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear(); }
+function uid() { return 'id' + Date.now().toString(36) + Math.floor(Math.random() * 1e5).toString(36); }
+function defaultStore() {
+  return { teams: ['Marketing', 'Tecnologia', 'Financeiro', 'Secretaria de Vendas'], people: [], requesters: [], projects: [], loose: [], seq: 1 };
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    let store = null;
+    try { const raw = localStorage.getItem(LS_KEY); if (raw) store = JSON.parse(raw); } catch (e) {}
+    if (!store || !Array.isArray(store.projects)) store = defaultStore();
+    if (!Array.isArray(store.teams) || !store.teams.length) store.teams = defaultStore().teams;
+    this.state = {
+      store, team: 'Todas as equipes', view: 'projects', projectId: null,
+      q: '', owner: 'Todos os responsáveis', requester: 'Todos os requerentes', status: 'Todos os status', lateOnly: false, board: null,
+      looseQ: '', looseStatus: 'Todos os status',
+      modalOpen: false, draft: null, draftError: '',
+      taskDraft: null, taskError: '',
+      cal: null, perfMonth: null,
+      pName: '', pRole: '', pTeam: store.teams[0], rName: '', rRole: '', tmName: '', regError: ''
+    };
+  }
+
+  mutate(fn, extra) {
+    const s = JSON.parse(JSON.stringify(this.state.store));
+    fn(s);
+    try { localStorage.setItem(LS_KEY, JSON.stringify(s)); } catch (e) {}
+    this.setState(Object.assign({ store: s }, extra || {}));
+  }
+
+  maps() {
+    const st = this.state.store;
+    const TEAMS = {}; st.teams.forEach((t, i) => { TEAMS[t] = PALETTE[i % PALETTE.length]; });
+    const PEOPLE = {}, TEAM_OF = {}, ROLES = {};
+    st.people.forEach((p, i) => { PEOPLE[p.name] = PALETTE[(i + 2) % PALETTE.length]; TEAM_OF[p.name] = p.team; ROLES[p.name] = p.role; });
+    const REQ = {}; st.requesters.forEach((r, i) => { const c = PALETTE[(i + 4) % PALETTE.length]; REQ[r.name] = { role: r.role, bg: c.bg, fg: c.fg }; });
+    return { TEAMS, PEOPLE, TEAM_OF, ROLES, REQ };
+  }
+
+  decorate(t, M, TODAY) {
+    const st = STATUS[t.status] || STATUS.backlog;
+    const p = M.PEOPLE[t.owner] || { bg: '#F1F5F9', fg: '#475569' };
+    const r = M.REQ[t.requester] || { bg: '#F1F5F9', fg: '#475569', role: '' };
+    const d = new Date(t.due + 'T00:00:00');
+    const diff = Math.round((d - TODAY) / DAY);
+    const late = diff < 0 && t.status !== 'concluido';
+    const soon = diff >= 0 && diff <= 3 && t.status !== 'concluido';
+    const prio = PRIORITY[t.priority] || PRIORITY['Baixa'];
+    const tm = M.TEAM_OF[t.owner] || this.state.store.teams[0];
+    const tc = M.TEAMS[tm] || PALETTE[7];
+    return Object.assign({}, t, {
+      rawStatus: t.status,
+      team: tm, teamBg: tc.bg, teamFg: tc.fg,
+      status: st.label, badgeBg: st.bg, badgeFg: st.fg,
+      pct: t.progress + '%',
+      initials: initials(t.owner), avBg: p.bg, avFg: p.fg,
+      reqInitials: initials(t.requester), reqBg: r.bg, reqFg: r.fg, requesterRole: r.role,
+      late,
+      dueLabel: late ? 'Atrasada · ' + fmt(d) : fmt(d),
+      dueFg: late ? '#DC2626' : soon ? '#D97706' : '#64748B',
+      dueBg: late ? '#FEF2F2' : soon ? '#FFFBEB' : '#F8FAFC',
+      openedLabel: t.createdAt ? fmt(new Date(t.createdAt + 'T00:00:00')) : '',
+      prioBg: prio.bg, prioFg: prio.fg
+    });
+  }
+
+  projectSummary(p, M, TODAY) {
+    const tasks = p.tasks.map(t => this.decorate(t, M, TODAY));
+    const done = tasks.filter(t => t.rawStatus === 'concluido').length;
+    const lateCount = tasks.filter(t => t.late).length;
+    const progress = tasks.length ? Math.round(tasks.reduce((s, t) => s + t.progress, 0) / tasks.length) : 0;
+    const d = new Date(p.due + 'T00:00:00');
+    const diff = Math.round((d - TODAY) / DAY);
+    const r = M.REQ[p.requester] || { bg: '#F1F5F9', fg: '#475569', role: '' };
+    const names = [];
+    tasks.forEach(t => { if (names.indexOf(t.owner) < 0) names.push(t.owner); });
+    const state = !tasks.length ? 'Planejamento' : (done === tasks.length ? 'Concluído' : (lateCount > 0 || diff < 0) ? 'Crítico' : 'Em andamento');
+    const stColor = state === 'Crítico' ? { bg: '#FEF2F2', fg: '#DC2626' } : state === 'Planejamento' ? { bg: '#F1F5F9', fg: '#64748B' } : state === 'Concluído' ? { bg: '#F0FDF4', fg: '#16A34A' } : { bg: '#EFF6FF', fg: '#2563EB' };
+    const tc = M.TEAMS[p.team] || PALETTE[7];
+    return {
+      id: p.id, code: p.code, name: p.name, description: p.description,
+      teamName: p.team, teamBg: tc.bg, teamFg: tc.fg,
+      requester: p.requester, requesterRole: r.role, reqInitials: initials(p.requester), reqBg: r.bg, reqFg: r.fg,
+      stLabel: state, stBg: stColor.bg, stFg: stColor.fg,
+      progress, pct: progress + '%',
+      barColor: progress >= 80 ? '#16A34A' : progress >= 40 ? '#2563EB' : '#94A3B8',
+      taskSummary: done + ' de ' + tasks.length + ' concluídas',
+      total: tasks.length, done, lateCount,
+      dueFull: fmtFull(d),
+      dueLabel: diff < 0 && state !== 'Concluído' ? 'Atrasado · ' + fmt(d) : fmt(d),
+      dueRelative: diff < 0 ? Math.abs(diff) + ' dias de atraso' : diff + ' dias restantes',
+      dueFg: diff < 0 && state !== 'Concluído' ? '#DC2626' : diff <= 14 ? '#D97706' : '#64748B',
+      hasAlert: lateCount > 0,
+      alertLabel: lateCount + ' tarefa(s) atrasada(s)',
+      team: names.map(n => { const c = M.PEOPLE[n] || PALETTE[7]; return { name: n, initials: initials(n), bg: c.bg, fg: c.fg }; }),
+      tasks
+    };
+  }
+
+  blankDraft() {
+    const st = this.state.store;
+    const p0 = st.people[0] ? st.people[0].name : '';
+    return { kind: 'project', editing: null, name: '', description: '', requester: st.requesters[0] ? st.requesters[0].name : '', owner: p0, team: st.teams[0], due: '', priority: 'Média', tasks: [{ name: '', owner: p0, due: '' }] };
+  }
+  setDraft(patch) { this.setState(s => ({ draft: Object.assign({}, s.draft, patch), draftError: '' })); }
+  setDraftTask(i, patch) {
+    this.setState(s => ({ draft: Object.assign({}, s.draft, { tasks: s.draft.tasks.map((t, j) => j === i ? Object.assign({}, t, patch) : t) }), draftError: '' }));
+  }
+  submitDraft() {
+    const st = this.state.store;
+    const d = this.state.draft;
+    if (!st.people.length || !st.requesters.length) return this.setState({ draftError: 'Cadastre colaboradores e requerentes antes (aba Cadastros).' });
+    if (!d.name.trim()) return this.setState({ draftError: 'Informe o nome da demanda.' });
+    if (!d.due) return this.setState({ draftError: 'Informe o prazo final.' });
+    const iso = isoOf(todayZero());
+    if (d.editing) {
+      this.mutate(s => {
+        const p = s.projects.filter(x => x.id === d.editing)[0];
+        if (p) { p.name = d.name.trim(); p.description = d.description.trim(); p.requester = d.requester; p.team = d.team; p.due = d.due; }
+      }, { modalOpen: false });
+      return;
+    }
+    if (d.kind === 'loose') {
+      const item = { id: uid(), code: 'AV-' + String(st.seq).padStart(2, '0'), name: d.name.trim(), owner: d.owner, requester: d.requester, status: 'backlog', progress: 0, due: d.due, createdAt: iso, completedAt: null, priority: d.priority };
+      this.mutate(s => { s.loose.push(item); s.seq++; }, { modalOpen: false, view: 'loose', looseQ: '', looseStatus: 'Todos os status' });
+      return;
+    }
+    const rows = d.tasks.filter(t => t.name.trim());
+    if (!rows.length) return this.setState({ draftError: 'Adicione ao menos uma microtarefa com descrição.' });
+    const code = 'P' + st.seq;
+    const proj = {
+      id: uid(), code, name: d.name.trim(),
+      description: d.description.trim() || 'Demanda solicitada por ' + d.requester + '.',
+      requester: d.requester, due: d.due, team: d.team, createdAt: iso,
+      tasks: rows.map((t, i) => ({ id: uid(), code: code + '-' + (i + 1), name: t.name.trim(), owner: t.owner, requester: d.requester, status: 'backlog', progress: 0, due: t.due || d.due, tag: 'Geral', createdAt: iso, completedAt: null }))
+    };
+    this.mutate(s => { s.projects.push(proj); s.seq++; }, { modalOpen: false, view: 'detail', projectId: proj.id, q: '', owner: 'Todos os responsáveis', requester: 'Todos os requerentes', status: 'Todos os status', lateOnly: false });
+  }
+
+  openTask(scope, projId, taskId) {
+    const s = this.state.store;
+    const t = scope === 'project'
+      ? (s.projects.filter(p => p.id === projId)[0] || { tasks: [] }).tasks.filter(x => x.id === taskId)[0]
+      : s.loose.filter(x => x.id === taskId)[0];
+    if (!t) return;
+    this.setState({ taskDraft: { mode: 'edit', scope, projId, taskId, name: t.name, owner: t.owner, requester: t.requester, due: t.due, tag: t.tag || '', priority: t.priority || 'Média', status: t.status, progress: t.progress }, taskError: '' });
+  }
+  setTaskDraft(patch) { this.setState(s => ({ taskDraft: Object.assign({}, s.taskDraft, patch), taskError: '' })); }
+  saveTask() {
+    const td = this.state.taskDraft;
+    if (!td.name.trim()) return this.setState({ taskError: 'Informe a descrição.' });
+    if (!td.due) return this.setState({ taskError: 'Informe o prazo.' });
+    const iso = isoOf(todayZero());
+    const apply = t => {
+      t.name = td.name.trim(); t.owner = td.owner; t.requester = td.requester; t.due = td.due;
+      if (td.scope === 'project') t.tag = td.tag.trim() || 'Geral'; else t.priority = td.priority;
+      t.status = td.status;
+      t.progress = td.status === 'concluido' ? 100 : Number(td.progress) || 0;
+      if (td.status === 'concluido') { if (!t.completedAt) t.completedAt = iso; } else t.completedAt = null;
+    };
+    this.mutate(s => {
+      if (td.scope === 'loose') {
+        const t = s.loose.filter(x => x.id === td.taskId)[0];
+        if (t) apply(t);
+      } else {
+        const p = s.projects.filter(x => x.id === td.projId)[0];
+        if (!p) return;
+        if (td.mode === 'create') {
+          const nt = { id: uid(), code: p.code + '-' + (p.tasks.length + 1), createdAt: iso, completedAt: null, tag: 'Geral' };
+          apply(nt); p.tasks.push(nt);
+        } else {
+          const t = p.tasks.filter(x => x.id === td.taskId)[0];
+          if (t) apply(t);
+        }
+      }
+    }, { taskDraft: null });
+  }
+  deleteTask() {
+    const td = this.state.taskDraft;
+    if (!window.confirm('Excluir esta tarefa? Esta ação não pode ser desfeita.')) return;
+    this.mutate(s => {
+      if (td.scope === 'loose') s.loose = s.loose.filter(x => x.id !== td.taskId);
+      else {
+        const p = s.projects.filter(x => x.id === td.projId)[0];
+        if (p) p.tasks = p.tasks.filter(x => x.id !== td.taskId);
+      }
+    }, { taskDraft: null });
+  }
+  dropOn(projId, statusKey) {
+    const d = this._drag;
+    this._drag = null;
+    if (!d) return;
+    const iso = isoOf(todayZero());
+    this.mutate(s => {
+      const p = s.projects.filter(x => x.id === projId)[0];
+      if (!p) return;
+      const t = p.tasks.filter(x => x.id === d)[0];
+      if (!t || t.status === statusKey) return;
+      t.status = statusKey;
+      if (statusKey === 'concluido') { t.progress = 100; if (!t.completedAt) t.completedAt = iso; }
+      else { t.completedAt = null; if (t.progress === 100) t.progress = 90; if (statusKey === 'backlog') t.progress = 0; }
+    });
+  }
+
+  renderVals() {
+    const TODAY = todayZero();
+    const isoToday = isoOf(TODAY);
+    const M = this.maps();
+    const st = this.state.store;
+    let view = this.state.view;
+    const teamOptions = ['Todas as equipes'].concat(st.teams);
+    const teamSel = teamOptions.indexOf(this.state.team) >= 0 ? this.state.team : 'Todas as equipes';
+    const allTeams = teamSel === 'Todas as equipes';
+    const inTeam = t => allTeams || t.team === teamSel;
+
+    const allSummaries = st.projects.map(p => this.projectSummary(p, M, TODAY));
+    const scope = s => {
+      if (allTeams) return s;
+      const ts = s.tasks.filter(inTeam);
+      if (!ts.length) return null;
+      const done = ts.filter(t => t.rawStatus === 'concluido').length;
+      const lateCount = ts.filter(t => t.late).length;
+      const progress = Math.round(ts.reduce((a, t) => a + t.progress, 0) / ts.length);
+      const owners = ts.reduce((a, t) => (a.indexOf(t.owner) < 0 ? a.concat([t.owner]) : a), []);
+      return Object.assign({}, s, {
+        tasks: ts, total: ts.length, done, lateCount, progress, pct: progress + '%',
+        barColor: progress >= 80 ? '#16A34A' : progress >= 40 ? '#2563EB' : '#94A3B8',
+        taskSummary: done + ' de ' + ts.length + ' · ' + teamSel,
+        team: owners.map(n => { const c = M.PEOPLE[n] || PALETTE[7]; return { name: n, initials: initials(n), bg: c.bg, fg: c.fg }; }),
+        hasAlert: lateCount > 0, alertLabel: lateCount + ' tarefa(s) atrasada(s)'
+      });
+    };
+    const summaries = allSummaries.map(scope).filter(s => s !== null);
+    const allTasks = summaries.reduce((a, s) => a.concat(s.tasks), []);
+    const looseAll = st.loose.map(t => this.decorate(t, M, TODAY)).filter(inTeam);
+
+    const cur = allSummaries.filter(s => s.id === this.state.projectId)[0];
+    if (view === 'detail' && !cur) view = 'projects';
+    const onProjects = view === 'projects' || view === 'detail';
+    const tc = M.TEAMS[teamSel];
+
+    const vals = {
+      showProjects: view === 'projects', showDetail: view === 'detail', showLoose: view === 'loose',
+      showCal: view === 'cal', showPerf: view === 'perf', showReg: view === 'reg',
+      needsSetup: !st.people.length || !st.requesters.length,
+      noProjects: summaries.length === 0,
+      projects: summaries.map(s => Object.assign({}, s, { open: () => this.setState({ view: 'detail', projectId: s.id, q: '', owner: 'Todos os responsáveis', requester: 'Todos os requerentes', status: 'Todos os status', lateOnly: false }) })),
+      portfolioStats: [
+        { label: allTeams ? 'Projetos ativos' : 'Projetos da equipe', value: summaries.length, color: '#0F172A' },
+        { label: 'Microtarefas', value: allTasks.length, color: '#0F172A' },
+        { label: 'Aguardando aprov.', value: allTasks.filter(t => t.rawStatus === 'aprovacao').length, color: '#D97706' },
+        { label: 'Atrasadas', value: allTasks.filter(t => t.late).length, color: '#DC2626' }
+      ],
+      statusOptions: ['Todos os status'].concat(Object.keys(STATUS).map(x => STATUS[x].label)),
+      statusKeys: Object.keys(STATUS).map(k => ({ key: k, label: STATUS[k].label })),
+      team: teamSel, teamOptions,
+      onTeam: e => this.setState({ team: e.target.value }),
+      teamDot: allTeams ? '#94A3B8' : (tc ? tc.dot : '#94A3B8'),
+      teamChipBg: allTeams ? '#FFFFFF' : tc.bg,
+      teamChipBorder: allTeams ? '#E2E8F0' : tc.bg,
+      teamChipFg: allTeams ? '#334155' : tc.fg,
+      goProjects: () => this.setState({ view: 'projects' }),
+      goLoose: () => this.setState({ view: 'loose' }),
+      goCal: () => this.setState({ view: 'cal' }),
+      goPerf: () => this.setState({ view: 'perf' }),
+      goReg: () => this.setState({ view: 'reg' }),
+      navProjBg: onProjects ? '#FFFFFF' : 'transparent', navProjFg: onProjects ? '#0F172A' : '#64748B', navProjShadow: onProjects ? '0 1px 2px rgba(15,23,42,.10)' : 'none',
+      navLooseBg: view === 'loose' ? '#FFFFFF' : 'transparent', navLooseFg: view === 'loose' ? '#0F172A' : '#64748B', navLooseShadow: view === 'loose' ? '0 1px 2px rgba(15,23,42,.10)' : 'none',
+      navCalBg: view === 'cal' ? '#FFFFFF' : 'transparent', navCalFg: view === 'cal' ? '#0F172A' : '#64748B', navCalShadow: view === 'cal' ? '0 1px 2px rgba(15,23,42,.10)' : 'none',
+      navPerfBg: view === 'perf' ? '#FFFFFF' : 'transparent', navPerfFg: view === 'perf' ? '#0F172A' : '#64748B', navPerfShadow: view === 'perf' ? '0 1px 2px rgba(15,23,42,.10)' : 'none',
+      navRegBg: view === 'reg' ? '#FFFFFF' : 'transparent', navRegFg: view === 'reg' ? '#0F172A' : '#64748B', navRegShadow: view === 'reg' ? '0 1px 2px rgba(15,23,42,.10)' : 'none',
+      stop: e => e.stopPropagation()
+    };
+
+    // Modal Nova demanda
+    const draft = this.state.draft || this.blankDraft();
+    const isProjDraft = draft.kind === 'project';
+    const activeK = { bg: '#FFFFFF', fg: '#0F172A', shadow: '0 1px 2px rgba(15,23,42,.10)' };
+    const idleK = { bg: 'transparent', fg: '#64748B', shadow: 'none' };
+    const kp = isProjDraft ? activeK : idleK;
+    const kl = isProjDraft ? idleK : activeK;
+    Object.assign(vals, {
+      modalOpen: this.state.modalOpen,
+      modalTitle: draft.editing ? 'Editar projeto' : 'Nova demanda',
+      modalNeedsSetup: !st.people.length || !st.requesters.length,
+      goRegFromModal: () => this.setState({ modalOpen: false, view: 'reg' }),
+      openModal: () => this.setState({ modalOpen: true, draft: this.blankDraft(), draftError: '' }),
+      closeModal: () => this.setState({ modalOpen: false, draftError: '' }),
+      isCreating: !draft.editing,
+      setKindProject: () => this.setDraft({ kind: 'project' }),
+      setKindLoose: () => this.setDraft({ kind: 'loose' }),
+      isProjDraft, isLooseDraft: !isProjDraft,
+      showTaskRows: isProjDraft && !draft.editing,
+      kindProjBg: kp.bg, kindProjFg: kp.fg, kindProjShadow: kp.shadow,
+      kindLooseBg: kl.bg, kindLooseFg: kl.fg, kindLooseShadow: kl.shadow,
+      dName: draft.name, onDName: e => this.setDraft({ name: e.target.value }),
+      dNamePlaceholder: isProjDraft ? 'Ex.: Campanha de lançamento do produto X' : 'Ex.: Ajuste na arte do post de sábado',
+      dDesc: draft.description, onDDesc: e => this.setDraft({ description: e.target.value }),
+      dRequester: draft.requester, onDRequester: e => this.setDraft({ requester: e.target.value }),
+      dOwner: draft.owner, onDOwner: e => this.setDraft({ owner: e.target.value }),
+      dTeam: draft.team, onDTeam: e => this.setDraft({ team: e.target.value }),
+      dDue: draft.due, onDDue: e => this.setDraft({ due: e.target.value }),
+      dPriority: draft.priority, onDPriority: e => this.setDraft({ priority: e.target.value }),
+      requesterList: st.requesters.map(r => r.name),
+      peopleList: st.people.map(p => p.name),
+      teamList: st.teams,
+      draftTasks: draft.tasks.map((t, i) => ({
+        name: t.name, owner: t.owner, due: t.due,
+        onName: e => this.setDraftTask(i, { name: e.target.value }),
+        onOwner: e => this.setDraftTask(i, { owner: e.target.value }),
+        onDue: e => this.setDraftTask(i, { due: e.target.value }),
+        remove: () => this.setState(s => ({ draft: Object.assign({}, s.draft, { tasks: s.draft.tasks.length > 1 ? s.draft.tasks.filter((x, j) => j !== i) : s.draft.tasks }) }))
+      })),
+      addTaskRow: () => this.setState(s => ({ draft: Object.assign({}, s.draft, { tasks: s.draft.tasks.concat([{ name: '', owner: draft.owner, due: '' }]) }) })),
+      hasDraftError: !!this.state.draftError, draftError: this.state.draftError,
+      submitDraft: () => this.submitDraft(),
+      submitLabel: draft.editing ? 'Salvar alterações' : isProjDraft ? 'Criar projeto' : 'Criar tarefa avulsa'
+    });
+
+    // Editor de tarefa
+    const td = this.state.taskDraft;
+    Object.assign(vals, {
+      taskEditOpen: !!td,
+      taskModalTitle: td ? (td.mode === 'create' ? 'Nova microtarefa' : td.scope === 'loose' ? 'Editar tarefa avulsa' : 'Editar microtarefa') : '',
+      tName: td ? td.name : '', onTName: e => this.setTaskDraft({ name: e.target.value }),
+      tOwner: td ? td.owner : '', onTOwner: e => this.setTaskDraft({ owner: e.target.value }),
+      tRequester: td ? td.requester : '', onTRequester: e => this.setTaskDraft({ requester: e.target.value }),
+      tDue: td ? td.due : '', onTDue: e => this.setTaskDraft({ due: e.target.value }),
+      tTag: td ? td.tag : '', onTTag: e => this.setTaskDraft({ tag: e.target.value }),
+      tPriority: td ? td.priority : 'Média', onTPriority: e => this.setTaskDraft({ priority: e.target.value }),
+      tStatus: td ? td.status : 'backlog', onTStatus: e => this.setTaskDraft({ status: e.target.value }),
+      tProgress: td ? td.progress : 0, onTProgress: e => this.setTaskDraft({ progress: Number(e.target.value) }),
+      tIsProj: td ? td.scope === 'project' : true, tIsLoose: td ? td.scope === 'loose' : false,
+      tCanDelete: td ? td.mode === 'edit' : false,
+      hasTaskError: !!this.state.taskError, taskError: this.state.taskError,
+      closeTask: () => this.setState({ taskDraft: null, taskError: '' }),
+      saveTask: () => this.saveTask(),
+      deleteTask: () => this.deleteTask()
+    });
+
+    // Tarefas avulsas
+    const lq = this.state.looseQ.trim().toLowerCase();
+    const looseRows = looseAll.filter(t =>
+      (!lq || t.name.toLowerCase().includes(lq) || t.code.toLowerCase().includes(lq) || t.requester.toLowerCase().includes(lq)) &&
+      (this.state.looseStatus.startsWith('Todos') || t.status === this.state.looseStatus)
+    ).map(t => Object.assign({}, t, { openEdit: () => this.openTask('loose', null, t.id) }));
+    Object.assign(vals, {
+      looseRows, looseEmpty: looseRows.length === 0,
+      looseQ: this.state.looseQ, looseStatus: this.state.looseStatus,
+      onLooseSearch: e => this.setState({ looseQ: e.target.value }),
+      onLooseStatus: e => this.setState({ looseStatus: e.target.value }),
+      looseKpis: [
+        { label: 'Total de avulsas', value: looseAll.length, unit: 'itens', color: '#475569' },
+        { label: 'Em desenvolvimento', value: looseAll.filter(t => t.rawStatus === 'dev').length, unit: 'em curso', color: '#2563EB' },
+        { label: 'Aguardando aprovação', value: looseAll.filter(t => t.rawStatus === 'aprovacao').length, unit: 'travadas', color: '#D97706' },
+        { label: 'Prioridade alta', value: looseAll.filter(t => t.priority === 'Alta').length, unit: 'urgentes', color: '#DC2626' }
+      ]
+    });
+
+    // Calendário
+    const cal = this.state.cal || { y: TODAY.getFullYear(), m: TODAY.getMonth() };
+    const calEvents = {};
+    allSummaries.forEach(s => s.tasks.filter(inTeam).forEach(t => {
+      (calEvents[t.due] = calEvents[t.due] || []).push({
+        label: s.code + ' · ' + t.name, projId: s.id, taskId: t.id,
+        bg: t.late ? '#FEE2E2' : t.badgeBg, fg: t.late ? '#DC2626' : t.badgeFg,
+        tooltip: '[' + s.code + '] ' + t.name + ' · ' + t.owner + ' · ' + t.status
+      });
+    }));
+    looseAll.forEach(t => {
+      (calEvents[t.due] = calEvents[t.due] || []).push({
+        label: 'AV · ' + t.name, projId: null, taskId: t.id,
+        bg: t.late ? '#FEE2E2' : t.badgeBg, fg: t.late ? '#DC2626' : t.badgeFg,
+        tooltip: '[Avulsa] ' + t.name + ' · ' + t.owner + ' · ' + t.status
+      });
+    });
+    const first = new Date(cal.y, cal.m, 1);
+    const gridStart = new Date(cal.y, cal.m, 1 - first.getDay());
+    const calWeeks = [];
+    let calCount = 0;
+    for (let w = 0; w < 6; w++) {
+      const days = [];
+      for (let dd = 0; dd < 7; dd++) {
+        const dt = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + w * 7 + dd);
+        const inMonth = dt.getMonth() === cal.m;
+        const dIso = isoOf(dt);
+        const evs = calEvents[dIso] || [];
+        if (inMonth) calCount += evs.length;
+        const isToday = dIso === isoToday;
+        days.push({
+          num: dt.getDate(),
+          bg: inMonth ? '#FFFFFF' : '#FAFBFC',
+          numFg: isToday ? '#FFFFFF' : inMonth ? '#334155' : '#CBD5E1',
+          numBg: isToday ? '#DC2626' : 'transparent',
+          numWeight: isToday ? '700' : '500',
+          items: evs.slice(0, 3).map(e => Object.assign({}, e, {
+            open: e.projId
+              ? () => this.setState({ view: 'detail', projectId: e.projId, q: '', owner: 'Todos os responsáveis', requester: 'Todos os requerentes', status: 'Todos os status', lateOnly: false })
+              : () => this.openTask('loose', null, e.taskId)
+          })),
+          hasMore: evs.length > 3, more: evs.length - 3
+        });
+      }
+      if (w === 5 && days.every(x => x.bg === '#FAFBFC')) break;
+      calWeeks.push({ days });
+    }
+    Object.assign(vals, {
+      calWeeks, calCount,
+      calLabel: MONTHS_FULL[cal.m] + ' ' + cal.y,
+      calWeekdays: ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'],
+      calPrev: () => this.setState({ cal: { y: cal.m === 0 ? cal.y - 1 : cal.y, m: cal.m === 0 ? 11 : cal.m - 1 } }),
+      calNext: () => this.setState({ cal: { y: cal.m === 11 ? cal.y + 1 : cal.y, m: cal.m === 11 ? 0 : cal.m + 1 } }),
+      calToday: () => this.setState({ cal: { y: TODAY.getFullYear(), m: TODAY.getMonth() } }),
+      calLegend: Object.keys(STATUS).map(s2 => ({ label: STATUS[s2].label, color: STATUS[s2].fg })).concat([{ label: 'Atrasada', color: '#DC2626' }])
+    });
+
+    // Desempenho — calculado dos dados reais
+    const rawAll = [];
+    st.projects.forEach(p => p.tasks.forEach(t => rawAll.push({ t, proj: p.id })));
+    st.loose.forEach(t => rawAll.push({ t, proj: null }));
+    const monthsSet = {};
+    rawAll.forEach(x => { if (x.t.createdAt) monthsSet[x.t.createdAt.slice(0, 7)] = 1; if (x.t.completedAt) monthsSet[x.t.completedAt.slice(0, 7)] = 1; });
+    monthsSet[isoToday.slice(0, 7)] = 1;
+    const monthKeys = Object.keys(monthsSet).sort().reverse();
+    const labelOf = k => cap(MONTHS[Number(k.slice(5)) - 1]) + ' ' + k.slice(0, 4);
+    const byLabel = {}; monthKeys.forEach(k => { byLabel[labelOf(k)] = k; });
+    const monthOptions = monthKeys.map(labelOf);
+    const perfMonth = byLabel[this.state.perfMonth] ? this.state.perfMonth : labelOf(isoToday.slice(0, 7));
+    const mk = byLabel[perfMonth];
+    const msIso = mk + '-01';
+    const meIso = mk + '-' + String(new Date(Number(mk.slice(0, 4)), Number(mk.slice(5)), 0).getDate()).padStart(2, '0');
+    const isCurrentMonth = mk === isoToday.slice(0, 7);
+
+    const perNames = st.people.filter(p => allTeams || p.team === teamSel).map(p => p.name);
+    let people = perNames.map(n => {
+      const mine = rawAll.filter(x => x.t.owner === n);
+      const delivered = mine.filter(x => x.t.completedAt && x.t.completedAt >= msIso && x.t.completedAt <= meIso);
+      const assigned = mine.filter(x => (x.t.createdAt || '0') <= meIso && (!x.t.completedAt || x.t.completedAt >= msIso));
+      const lateDone = delivered.filter(x => x.t.completedAt > x.t.due).length;
+      const openOverdue = isCurrentMonth ? mine.filter(x => !x.t.completedAt && x.t.due < isoToday).length : 0;
+      const late = lateDone + openOverdue;
+      const avgDays = delivered.length ? delivered.reduce((s2, x) => s2 + Math.max(0, (new Date(x.t.completedAt) - new Date(x.t.createdAt || x.t.completedAt)) / DAY), 0) / delivered.length : 0;
+      const projIds = assigned.reduce((a, x) => (x.proj && a.indexOf(x.proj) < 0 ? a.concat([x.proj]) : a), []);
+      return { n, delivered: delivered.length, lateDone, assigned: assigned.length, late, avgDays, projects: projIds.length };
+    }).filter(p => p.assigned > 0);
+
+    const perfEmpty = people.length === 0;
+    if (perfEmpty) {
+      Object.assign(vals, {
+        perfEmpty: true, perfHasData: false, perfMonth, monthOptions,
+        onPerfMonth: e => this.setState({ perfMonth: e.target.value }),
+        ranking: [], attention: [], highlights: [], perfKpis: [],
+        teamAvg: 0, aboveCount: 0, belowCount: 0, aboveW: '0%', belowW: '0%'
+      });
+    } else {
+      const maxDelivered = Math.max.apply(null, people.map(p => p.delivered));
+      const speeds = people.filter(p => p.avgDays > 0);
+      const avgDaysTeam = speeds.length ? speeds.reduce((s2, p) => s2 + p.avgDays, 0) / speeds.length : 0;
+      let ranked = people.map(p => {
+        const c = M.PEOPLE[p.n] || PALETTE[7];
+        const tcm = M.TEAMS[M.TEAM_OF[p.n]] || PALETTE[7];
+        const onTime = p.delivered ? (p.delivered - p.lateDone) / p.delivered : 0;
+        const speed = p.avgDays > 0 && avgDaysTeam > 0 ? Math.max(0, Math.min(1, avgDaysTeam / p.avgDays * 0.6)) : 0.3;
+        const volume = maxDelivered > 0 ? p.delivered / maxDelivered : 0;
+        const score = Math.min(10, round1((onTime * 5 + speed * 3 + volume * 2) * 1.05));
+        const compl = p.assigned ? p.delivered / p.assigned : 0;
+        return {
+          name: p.n, role: M.ROLES[p.n] || '', initials: initials(p.n), bg: c.bg, fg: c.fg,
+          team: M.TEAM_OF[p.n] || '', teamBg: tcm.bg, teamFg: tcm.fg,
+          delivered: p.delivered, assigned: p.assigned, projects: p.projects, avgDays: round1(p.avgDays), late: p.late,
+          completion: Math.round(compl * 100) + '%', completionW: Math.round(compl * 100) + '%',
+          completionColor: compl >= 0.8 ? '#16A34A' : compl >= 0.6 ? '#D97706' : '#DC2626',
+          openTasks: p.assigned - p.delivered,
+          score,
+          lateColor: p.late >= 3 ? '#DC2626' : p.late > 0 ? '#D97706' : '#16A34A',
+          speedColor: p.avgDays > avgDaysTeam ? '#D97706' : '#16A34A'
+        };
+      }).sort((a, b) => b.score - a.score);
+      const teamAvg = round1(ranked.reduce((s2, p) => s2 + p.score, 0) / ranked.length);
+      ranked = ranked.map((p, i) => Object.assign({}, p, {
+        rank: i + 1,
+        below: p.score < teamAvg,
+        rowBg: p.score < teamAvg ? '#FEF7F7' : '#FFFFFF',
+        rankColor: i === 0 ? '#D97706' : '#94A3B8',
+        scoreColor: p.score < teamAvg ? '#DC2626' : p.score >= teamAvg + 0.6 ? '#16A34A' : '#2563EB',
+        scoreW: (p.score * 10) + '%'
+      }));
+      const belowList = ranked.filter(p => p.below);
+      const worstLate = ranked.slice().sort((a, b) => b.late - a.late)[0];
+      const totalDelivered = ranked.reduce((s2, p) => s2 + p.delivered, 0);
+      const totalAssigned = ranked.reduce((s2, p) => s2 + p.assigned, 0);
+      const totalLate = ranked.reduce((s2, p) => s2 + p.late, 0);
+      const projDone = st.projects.filter(p => p.tasks.length && p.tasks.every(t => t.completedAt) && p.tasks.map(t => t.completedAt).sort().reverse()[0] >= msIso && p.tasks.map(t => t.completedAt).sort().reverse()[0] <= meIso).length;
+      Object.assign(vals, {
+        perfEmpty: false, perfHasData: true, perfMonth, monthOptions,
+        onPerfMonth: e => this.setState({ perfMonth: e.target.value }),
+        ranking: ranked, teamAvg,
+        aboveCount: ranked.length - belowList.length, belowCount: belowList.length,
+        aboveW: Math.round((ranked.length - belowList.length) / ranked.length * 100) + '%',
+        belowW: Math.round(belowList.length / ranked.length * 100) + '%',
+        perfKpis: [
+          { label: 'Entregues / atribuídas', value: totalDelivered, unit: 'de ' + totalAssigned + ' atribuídas', color: '#475569', valueColor: '#0F172A', sub: projDone + ' projeto(s) macro finalizados', subColor: '#64748B' },
+          { label: 'Tempo médio de execução', value: round1(avgDaysTeam), unit: 'dias/tarefa', color: '#2563EB', valueColor: '#0F172A', sub: 'Da abertura à conclusão', subColor: '#64748B' },
+          { label: 'Mais tarefas atrasadas', value: worstLate.late, unit: 'atrasos', color: '#DC2626', valueColor: worstLate.late ? '#DC2626' : '#16A34A', sub: worstLate.late ? worstLate.name + (worstLate.role ? ' · ' + worstLate.role : '') : 'Ninguém com atraso', subColor: worstLate.late ? '#DC2626' : '#16A34A' },
+          { label: 'Total de atrasos da equipe', value: totalLate, unit: 'no mês', color: '#D97706', valueColor: '#0F172A', sub: totalDelivered ? Math.round(totalLate / totalDelivered * 100) + '% das entregas fora do prazo' : 'Nenhuma entrega registrada ainda', subColor: '#64748B' }
+        ],
+        attention: belowList.map(p => ({
+          name: p.name, initials: p.initials, bg: p.bg, fg: p.fg,
+          note: 'Nota ' + p.score + ' (média ' + teamAvg + '). ' + p.late + ' entrega(s) fora do prazo e tempo médio de ' + p.avgDays + ' dias — agendar feedback 1:1.'
+        })),
+        highlights: ranked.filter(p => !p.below).slice(0, 3).map(p => ({
+          name: p.name, initials: p.initials, bg: p.bg, fg: p.fg,
+          note: 'Nota ' + p.score + ' · ' + p.delivered + ' entregas em ' + p.projects + ' projeto(s), ' + p.late + ' atraso(s).'
+        }))
+      });
+    }
+
+    // Cadastros
+    Object.assign(vals, {
+      peopleCount: st.people.length, reqCount: st.requesters.length, teamCount: st.teams.length,
+      regPeople: st.people.map(p => {
+        const c = M.PEOPLE[p.name] || PALETTE[7];
+        const tcm = M.TEAMS[p.team] || PALETTE[7];
+        return {
+          name: p.name, role: p.role, team: p.team, initials: initials(p.name), bg: c.bg, fg: c.fg, teamBg: tcm.bg, teamFg: tcm.fg,
+          remove: () => { if (window.confirm('Remover ' + p.name + '? As tarefas existentes continuam com o nome registrado.')) this.mutate(s => { s.people = s.people.filter(x => x.name !== p.name); }); }
+        };
+      }),
+      regReqs: st.requesters.map(r => {
+        const c = M.REQ[r.name] || { bg: '#F1F5F9', fg: '#475569' };
+        return {
+          name: r.name, role: r.role, initials: initials(r.name), bg: c.bg, fg: c.fg,
+          remove: () => { if (window.confirm('Remover requerente ' + r.name + '?')) this.mutate(s => { s.requesters = s.requesters.filter(x => x.name !== r.name); }); }
+        };
+      }),
+      regTeams: st.teams.map(t => {
+        const tcm = M.TEAMS[t] || PALETTE[7];
+        const count = st.people.filter(p => p.team === t).length;
+        return {
+          name: t, dot: tcm.dot, count,
+          remove: () => {
+            if (count > 0) { this.setState({ regError: 'A equipe "' + t + '" tem colaboradores vinculados — mova-os antes de remover.' }); return; }
+            if (st.teams.length <= 1) { this.setState({ regError: 'É preciso manter ao menos uma equipe.' }); return; }
+            if (window.confirm('Remover equipe ' + t + '?')) this.mutate(s => { s.teams = s.teams.filter(x => x !== t); }, { regError: '' });
+          }
+        };
+      }),
+      pName: this.state.pName, onPName: e => this.setState({ pName: e.target.value, regError: '' }),
+      pRole: this.state.pRole, onPRole: e => this.setState({ pRole: e.target.value }),
+      pTeam: st.teams.indexOf(this.state.pTeam) >= 0 ? this.state.pTeam : st.teams[0], onPTeam: e => this.setState({ pTeam: e.target.value }),
+      addPerson: () => {
+        const n = this.state.pName.trim();
+        if (!n) return this.setState({ regError: 'Informe o nome do colaborador.' });
+        if (st.people.some(p => p.name.toLowerCase() === n.toLowerCase())) return this.setState({ regError: 'Já existe um colaborador com esse nome.' });
+        const tmv = st.teams.indexOf(this.state.pTeam) >= 0 ? this.state.pTeam : st.teams[0];
+        this.mutate(s => { s.people.push({ name: n, role: this.state.pRole.trim() || 'Colaborador(a)', team: tmv }); }, { pName: '', pRole: '', regError: '' });
+      },
+      rName: this.state.rName, onRName: e => this.setState({ rName: e.target.value, regError: '' }),
+      rRole: this.state.rRole, onRRole: e => this.setState({ rRole: e.target.value }),
+      addRequester: () => {
+        const n = this.state.rName.trim();
+        if (!n) return this.setState({ regError: 'Informe o nome do requerente.' });
+        if (st.requesters.some(r => r.name.toLowerCase() === n.toLowerCase())) return this.setState({ regError: 'Já existe um requerente com esse nome.' });
+        this.mutate(s => { s.requesters.push({ name: n, role: this.state.rRole.trim() || 'Solicitante' }); }, { rName: '', rRole: '', regError: '' });
+      },
+      tmName: this.state.tmName, onTmName: e => this.setState({ tmName: e.target.value, regError: '' }),
+      addTeam: () => {
+        const n = this.state.tmName.trim();
+        if (!n) return this.setState({ regError: 'Informe o nome da equipe.' });
+        if (st.teams.some(t => t.toLowerCase() === n.toLowerCase())) return this.setState({ regError: 'Essa equipe já existe.' });
+        this.mutate(s => { s.teams.push(n); }, { tmName: '', regError: '' });
+      },
+      hasRegError: !!this.state.regError, regError: this.state.regError
+    });
+
+    // Detalhe do projeto
+    if (cur && view === 'detail') {
+      const board = this.state.board || this.props.defaultView || 'kanban';
+      const q = this.state.q.trim().toLowerCase();
+      const tasks = cur.tasks;
+      const filtered = tasks.filter(t =>
+        inTeam(t) &&
+        (!q || t.name.toLowerCase().includes(q) || t.code.toLowerCase().includes(q) || (t.tag || '').toLowerCase().includes(q)) &&
+        (this.state.owner.startsWith('Todos') || t.owner === this.state.owner) &&
+        (this.state.requester.startsWith('Todos') || t.requester === this.state.requester) &&
+        (this.state.status.startsWith('Todos') || t.status === this.state.status) &&
+        (!this.state.lateOnly || t.late)
+      ).map(t => Object.assign({}, t, {
+        openEdit: () => this.openTask('project', cur.id, t.id),
+        drag: () => { this._drag = t.id; }
+      }));
+      const columns = Object.keys(STATUS).map(key => {
+        const col = filtered.filter(t => t.rawStatus === key);
+        return {
+          key, label: STATUS[key].label, color: STATUS[key].dot, count: col.length, tasks: col,
+          over: e => e.preventDefault(),
+          drop: () => this.dropOn(cur.id, key)
+        };
+      });
+      const dev = tasks.filter(t => t.rawStatus === 'dev').length;
+      const wait = tasks.filter(t => t.rawStatus === 'aprovacao').length;
+      const active = { bg: '#FFFFFF', fg: '#0F172A', shadow: '0 1px 2px rgba(15,23,42,.10)' };
+      const idle = { bg: 'transparent', fg: '#64748B', shadow: 'none' };
+      const k = board === 'kanban' ? active : idle;
+      const tb = board === 'table' ? active : idle;
+      const gt = board === 'gantt' ? active : idle;
+
+      const gItems = filtered.map(t => {
+        const end = new Date(t.due + 'T00:00:00');
+        let start = new Date((t.createdAt || t.due) + 'T00:00:00');
+        if (start >= end) start = new Date(end.getTime() - 2 * DAY);
+        return { t, start, end };
+      });
+      let ganttTicks = [], ganttRows = [], todayLeft = '0%', todayVisible = false;
+      if (gItems.length) {
+        let gMin = Math.min.apply(null, gItems.map(x => x.start.getTime()).concat([TODAY.getTime()])) - 2 * DAY;
+        let gMax = Math.max.apply(null, gItems.map(x => x.end.getTime()).concat([TODAY.getTime()])) + 3 * DAY;
+        const span = gMax - gMin;
+        const pctOf = ms2 => Math.max(0, Math.min(100, (ms2 - gMin) / span * 100));
+        let tick = new Date(gMin); tick.setHours(0, 0, 0, 0);
+        while (tick.getDay() !== 1) tick = new Date(tick.getTime() + DAY);
+        const step = span > 60 * DAY ? 14 : 7;
+        for (let d2 = tick; d2.getTime() <= gMax; d2 = new Date(d2.getTime() + step * DAY)) {
+          ganttTicks.push({ label: fmt(d2), left: pctOf(d2.getTime()).toFixed(2) + '%' });
+        }
+        todayLeft = pctOf(TODAY.getTime()).toFixed(2) + '%';
+        todayVisible = true;
+        ganttRows = gItems.slice().sort((a, b) => a.end - b.end).map(x => {
+          const l = pctOf(x.start.getTime()), r2 = pctOf(x.end.getTime());
+          return {
+            name: x.t.name, owner: x.t.owner, status: x.t.status, initials: x.t.initials, avBg: x.t.avBg, avFg: x.t.avFg,
+            openEdit: x.t.openEdit,
+            left: l.toFixed(2) + '%', width: Math.max(r2 - l, 1.5).toFixed(2) + '%', labelLeft: r2.toFixed(2) + '%',
+            barBg: x.t.late ? '#FEE2E2' : x.t.badgeBg, barFg: x.t.late ? '#DC2626' : x.t.badgeFg,
+            fill: x.t.progress + '%', dueLabel: x.t.dueLabel, dueFg: x.t.dueFg,
+            tooltip: x.t.name + ' · ' + x.t.owner + ' · entrega ' + x.t.dueLabel + ' · ' + x.t.progress + '%'
+          };
+        });
+      }
+
+      const ownersHere = []; const reqsHere = [];
+      tasks.forEach(t => { if (ownersHere.indexOf(t.owner) < 0) ownersHere.push(t.owner); if (reqsHere.indexOf(t.requester) < 0) reqsHere.push(t.requester); });
+
+      Object.assign(vals, {
+        cur, overall: cur.progress, overallW: cur.progress + '%',
+        totalTasks: tasks.length, visibleCount: filtered.length,
+        columns, rows: filtered,
+        empty: filtered.length === 0,
+        isKanban: board === 'kanban' && filtered.length > 0,
+        isTable: board === 'table' && filtered.length > 0,
+        isGantt: board === 'gantt' && filtered.length > 0,
+        kanbanBg: k.bg, kanbanFg: k.fg, kanbanShadow: k.shadow,
+        tableBg: tb.bg, tableFg: tb.fg, tableShadow: tb.shadow,
+        ganttBg: gt.bg, ganttFg: gt.fg, ganttShadow: gt.shadow,
+        ganttTicks, ganttRows, todayLeft, todayVisible,
+        ganttLegend: Object.keys(STATUS).map(s2 => ({ label: STATUS[s2].label, bg: STATUS[s2].bg, fg: STATUS[s2].fg })).concat([{ label: 'Atrasada', bg: '#FEE2E2', fg: '#DC2626' }]),
+        kpis: [
+          { label: 'Total de microtarefas', value: tasks.length, unit: 'itens', icon: '≡', color: '#475569', bg: '#F1F5F9', sub: (tasks.length - cur.done) + ' em aberto no board', subColor: '#64748B' },
+          { label: 'Em desenvolvimento', value: dev, unit: 'em curso', icon: '◐', color: '#2563EB', bg: '#EFF6FF', sub: 'Distribuídas entre ' + cur.team.length + ' responsáveis', subColor: '#64748B' },
+          { label: 'Aguardando aprovação', value: wait, unit: 'travadas', icon: '!', color: '#D97706', bg: '#FFFBEB', sub: cur.lateCount + ' item(ns) com prazo estourado', subColor: cur.lateCount ? '#DC2626' : '#64748B' },
+          { label: 'Concluídas', value: cur.done, unit: 'de ' + tasks.length, icon: '✓', color: '#16A34A', bg: '#F0FDF4', sub: cur.progress + '% de progresso geral', subColor: '#16A34A' }
+        ],
+        q: this.state.q, owner: this.state.owner, requester: this.state.requester, status: this.state.status,
+        ownerOptions: ['Todos os responsáveis'].concat(ownersHere),
+        requesterOptions: ['Todos os requerentes'].concat(reqsHere),
+        lateBg: this.state.lateOnly ? '#FEF2F2' : '#FFFFFF',
+        lateFg: this.state.lateOnly ? '#DC2626' : '#334155',
+        lateBorder: this.state.lateOnly ? '#FECACA' : '#E2E8F0',
+        onSearch: e => this.setState({ q: e.target.value }),
+        onOwner: e => this.setState({ owner: e.target.value }),
+        onRequester: e => this.setState({ requester: e.target.value }),
+        onStatus: e => this.setState({ status: e.target.value }),
+        onLate: () => this.setState(s => ({ lateOnly: !s.lateOnly })),
+        setKanban: () => this.setState({ board: 'kanban' }),
+        setTable: () => this.setState({ board: 'table' }),
+        setGantt: () => this.setState({ board: 'gantt' }),
+        addMicroTask: () => this.setState({ taskDraft: { mode: 'create', scope: 'project', projId: cur.id, taskId: null, name: '', owner: st.people[0] ? st.people[0].name : '', requester: cur.requester, due: '', tag: '', priority: 'Média', status: 'backlog', progress: 0 }, taskError: '' }),
+        editProject: () => this.setState({ modalOpen: true, draftError: '', draft: { kind: 'project', editing: cur.id, name: cur.name, description: cur.description, requester: cur.requester, owner: st.people[0] ? st.people[0].name : '', team: cur.teamName, due: st.projects.filter(x => x.id === cur.id)[0].due, priority: 'Média', tasks: [] } }),
+        deleteProject: () => {
+          if (window.confirm('Excluir o projeto "' + cur.name + '" e todas as suas microtarefas?')) {
+            this.mutate(s => { s.projects = s.projects.filter(x => x.id !== cur.id); }, { view: 'projects', projectId: null });
+          }
+        }
+      });
+    } else {
+      Object.assign(vals, { cur: {}, columns: [], rows: [], ganttRows: [], ganttTicks: [], empty: false, isKanban: false, isTable: false, isGantt: false });
+    }
+
+    return vals;
+  }
+}
+</script>
+</body>
+</html>
