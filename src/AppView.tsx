@@ -257,7 +257,7 @@ export function AppView({ v }: { v: RenderVals }) {
               </div>
               <div style={css("display:flex;gap:14px;flex-wrap:wrap")}>
                 {v.portfolioStats.map((s) => (
-                  <div key={s} style={css("background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:12px 18px;display:flex;flex-direction:column;gap:3px;min-width:120px")}>
+                  <div key={s.label} style={css("background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:12px 18px;display:flex;flex-direction:column;gap:3px;min-width:120px")}>
                     <span style={css("font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#94A3B8")}>{s.label}</span>
                     <span style={css("font-size:22px;font-weight:700;letter-spacing:-.02em;color:{color}", s)}>{s.value}</span>
                   </div>
