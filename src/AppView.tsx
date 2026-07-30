@@ -23,7 +23,7 @@ export function AppView({ v }: { v: RenderVals }) {
               <span style={css("font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:{teamChipFg}", v)}>Equipe</span>
               <select value={v.team} onChange={v.onTeam} style={css("border:0;background:transparent;font-size:13px;font-weight:600;color:{teamChipFg};outline:none;cursor:pointer;padding:2px 0", v)}>
                 {v.teamOptions.map((tm) => (
-                  <option key={tm} value={tm}>{v.tm}</option>
+                  <option key={tm} value={tm}>{tm}</option>
                 ))}
               </select>
             </div>
@@ -84,7 +84,7 @@ export function AppView({ v }: { v: RenderVals }) {
                     <label style={css("font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B")}>Quem demandou *</label>
                     <select value={v.dRequester} onChange={v.onDRequester} style={css("padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none;cursor:pointer")}>
                       {v.requesterList.map((r) => (
-                        <option key={r} value={v.r}>{v.r}</option>
+                        <option key={r} value={r}>{r}</option>
                       ))}
                     </select>
                   </div>
@@ -93,7 +93,7 @@ export function AppView({ v }: { v: RenderVals }) {
                       <label style={css("font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B")}>Pessoa responsável *</label>
                       <select value={v.dOwner} onChange={v.onDOwner} style={css("padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none;cursor:pointer")}>
                         {v.peopleList.map((o) => (
-                          <option key={o} value={v.o}>{v.o}</option>
+                          <option key={o} value={o}>{o}</option>
                         ))}
                       </select>
                     </div>
@@ -102,7 +102,7 @@ export function AppView({ v }: { v: RenderVals }) {
                     <label style={css("font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B")}>Equipe</label>
                     <select value={v.dTeam} onChange={v.onDTeam} style={css("padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none;cursor:pointer")}>
                       {v.teamList.map((tm) => (
-                        <option key={tm} value={tm}>{v.tm}</option>
+                        <option key={tm} value={tm}>{tm}</option>
                       ))}
                     </select>
                   </div>
@@ -133,7 +133,7 @@ export function AppView({ v }: { v: RenderVals }) {
                         <input value={row.name} onChange={row.onName} placeholder="Descrição da microtarefa" style={css("padding:8px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:12.5px;outline:none;background:#FFFFFF")} />
                         <select value={row.owner} onChange={row.onOwner} style={css("padding:8px 9px;border:1px solid #E2E8F0;border-radius:8px;font-size:12px;background:#FFFFFF;outline:none;cursor:pointer")}>
                           {v.peopleList.map((o) => (
-                            <option key={o} value={v.o}>{v.o}</option>
+                            <option key={o} value={o}>{o}</option>
                           ))}
                         </select>
                         <input type="date" value={row.due} onChange={row.onDue} style={css("padding:7px 9px;border:1px solid #E2E8F0;border-radius:8px;font-size:12px;outline:none;color:#334155;background:#FFFFFF")} />
@@ -174,7 +174,7 @@ export function AppView({ v }: { v: RenderVals }) {
                     <label style={css("font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B")}>Responsável</label>
                     <select value={v.tOwner} onChange={v.onTOwner} style={css("padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none;cursor:pointer")}>
                       {v.peopleList.map((o) => (
-                        <option key={o} value={v.o}>{v.o}</option>
+                        <option key={o} value={o}>{o}</option>
                       ))}
                     </select>
                   </div>
@@ -182,7 +182,7 @@ export function AppView({ v }: { v: RenderVals }) {
                     <label style={css("font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#64748B")}>Quem demandou</label>
                     <select value={v.tRequester} onChange={v.onTRequester} style={css("padding:10px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;outline:none;cursor:pointer")}>
                       {v.requesterList.map((r) => (
-                        <option key={r} value={v.r}>{v.r}</option>
+                        <option key={r} value={r}>{r}</option>
                       ))}
                     </select>
                   </div>
@@ -400,17 +400,17 @@ export function AppView({ v }: { v: RenderVals }) {
                 </div>
                 <select value={v.owner} onChange={v.onOwner} style={css("padding:9px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;color:#334155;outline:none;cursor:pointer")}>
                   {v.ownerOptions.map((o) => (
-                    <option key={o} value={v.o}>{v.o}</option>
+                    <option key={o} value={o}>{o}</option>
                   ))}
                 </select>
                 <select value={v.requester} onChange={v.onRequester} style={css("padding:9px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;color:#334155;outline:none;cursor:pointer")}>
                   {v.requesterOptions.map((r) => (
-                    <option key={r} value={v.r}>{v.r}</option>
+                    <option key={r} value={r}>{r}</option>
                   ))}
                 </select>
                 <select value={v.status} onChange={v.onStatus} style={css("padding:9px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;color:#334155;outline:none;cursor:pointer")}>
                   {v.statusOptions.map((s) => (
-                    <option key={s} value={v.s}>{v.s}</option>
+                    <option key={s} value={s}>{s}</option>
                   ))}
                 </select>
                 <button onClick={v.onLate} style={css("padding:9px 13px;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid {lateBorder};background:{lateBg};color:{lateFg}", v)}>Somente atrasadas</button>
@@ -426,7 +426,7 @@ export function AppView({ v }: { v: RenderVals }) {
       
             <div style={css("display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px")}>
               {v.kpis.map((k) => (
-                <div key={k} style={css("background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:18px 20px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden")}>
+                <div key={k.label} style={css("background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:18px 20px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden")}>
                   <div style={css("position:absolute;left:0;top:0;bottom:0;width:3px;background:{color}", k)}></div>
                   <div style={css("display:flex;justify-content:space-between;align-items:flex-start;gap:12px")}>
                     <span style={css("font-size:12.5px;font-weight:600;color:#64748B")}>{k.label}</span>
@@ -445,7 +445,7 @@ export function AppView({ v }: { v: RenderVals }) {
               <>
               <div style={css("display:grid;grid-template-columns:repeat(4,minmax(260px,1fr));gap:16px;align-items:start")}>
                 {v.columns.map((col) => (
-                  <div key={col} onDragOver={col.over} onDrop={col.drop} style={css("background:#F1F5F9;border:1px solid #E2E8F0;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:180px")}>
+                  <div key={col.key} onDragOver={col.over} onDrop={col.drop} style={css("background:#F1F5F9;border:1px solid #E2E8F0;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:180px")}>
                     <div style={css("display:flex;align-items:center;justify-content:space-between;padding:2px 4px")}>
                       <div style={css("display:flex;align-items:center;gap:8px")}>
                         <span style={css("width:8px;height:8px;border-radius:99px;background:{color}", col)}></span>
@@ -538,7 +538,7 @@ export function AppView({ v }: { v: RenderVals }) {
                   <div style={css("padding:12px 20px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8")}>Microtarefa</div>
                   <div style={css("position:relative;height:40px;background:#F8FAFC;border-bottom:1px solid #E2E8F0;border-left:1px solid #E2E8F0;overflow:hidden")}>
                     {v.ganttTicks.map((tk) => (
-                      <div key={tk} style={css("position:absolute;top:0;bottom:0;left:{left};border-left:1px solid #E2E8F0;display:flex;align-items:center", tk)}>
+                      <div key={tk.left} style={css("position:absolute;top:0;bottom:0;left:{left};border-left:1px solid #E2E8F0;display:flex;align-items:center", tk)}>
                         <span style={css("font-size:10.5px;font-weight:600;color:#94A3B8;padding-left:6px;white-space:nowrap")}>{tk.label}</span>
                       </div>
                     ))}
@@ -559,7 +559,7 @@ export function AppView({ v }: { v: RenderVals }) {
                     </Hover>
                     <div style={css("position:relative;border-bottom:1px solid #F1F5F9;border-left:1px solid #E2E8F0;min-height:52px;overflow:hidden")}>
                       {v.ganttTicks.map((tk) => (
-                        <div key={tk} style={css("position:absolute;top:0;bottom:0;left:{left};border-left:1px solid #F1F5F9", tk)}></div>
+                        <div key={tk.left} style={css("position:absolute;top:0;bottom:0;left:{left};border-left:1px solid #F1F5F9", tk)}></div>
                       ))}
                       {(v.todayVisible) && (
                         <div style={css("position:absolute;top:0;bottom:0;left:{todayLeft};border-left:2px solid rgba(220,38,38,.35)", v)}></div>
@@ -604,7 +604,7 @@ export function AppView({ v }: { v: RenderVals }) {
                 </div>
                 <select value={v.looseStatus} onChange={v.onLooseStatus} style={css("padding:9px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;color:#334155;outline:none;cursor:pointer")}>
                   {v.statusOptions.map((s) => (
-                    <option key={s} value={v.s}>{v.s}</option>
+                    <option key={s} value={s}>{s}</option>
                   ))}
                 </select>
               </div>
@@ -612,7 +612,7 @@ export function AppView({ v }: { v: RenderVals }) {
       
             <div style={css("display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px")}>
               {v.looseKpis.map((k) => (
-                <div key={k} style={css("background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:18px 20px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden")}>
+                <div key={k.label} style={css("background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:18px 20px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden")}>
                   <div style={css("position:absolute;left:0;top:0;bottom:0;width:3px;background:{color}", k)}></div>
                   <span style={css("font-size:12.5px;font-weight:600;color:#64748B")}>{k.label}</span>
                   <div style={css("display:flex;align-items:flex-end;gap:8px")}>
@@ -697,7 +697,7 @@ export function AppView({ v }: { v: RenderVals }) {
             <div style={css("background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);overflow:hidden")}>
               <div style={css("display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:#F8FAFC;border-bottom:1px solid #E2E8F0")}>
                 {v.calWeekdays.map((w) => (
-                  <span key={w} style={css("padding:10px 12px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8")}>{v.w}</span>
+                  <span key={w} style={css("padding:10px 12px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#94A3B8")}>{w}</span>
                 ))}
               </div>
               {v.calWeeks.map((wk) => (
@@ -733,7 +733,7 @@ export function AppView({ v }: { v: RenderVals }) {
                 <span style={css("font-size:12px;color:#94A3B8;font-weight:600")}>Mês de referência</span>
                 <select value={v.perfMonth} onChange={v.onPerfMonth} style={css("padding:9px 12px;border:1px solid #E2E8F0;border-radius:9px;font-size:13px;background:#FFFFFF;color:#334155;outline:none;cursor:pointer")}>
                   {v.monthOptions.map((m) => (
-                    <option key={m} value={v.m}>{v.m}</option>
+                    <option key={m} value={m}>{m}</option>
                   ))}
                 </select>
               </div>
@@ -750,7 +750,7 @@ export function AppView({ v }: { v: RenderVals }) {
               <>
               <div style={css("display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px")}>
                 {v.perfKpis.map((k) => (
-                  <div key={k} style={css("background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:18px 20px;display:flex;flex-direction:column;gap:11px;position:relative;overflow:hidden")}>
+                  <div key={k.label} style={css("background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);padding:18px 20px;display:flex;flex-direction:column;gap:11px;position:relative;overflow:hidden")}>
                     <div style={css("position:absolute;left:0;top:0;bottom:0;width:3px;background:{color}", k)}></div>
                     <span style={css("font-size:12.5px;font-weight:600;color:#64748B")}>{k.label}</span>
                     <div style={css("display:flex;align-items:flex-end;gap:8px")}>
@@ -805,7 +805,7 @@ export function AppView({ v }: { v: RenderVals }) {
                   <span>Nota</span>
                 </div>
                 {v.ranking.map((p) => (
-                  <div key={p} style={css("display:grid;grid-template-columns:40px minmax(190px,1.5fr) .8fr .8fr 1.2fr .8fr .9fr .9fr 1.3fr;gap:12px;padding:14px 20px;border-bottom:1px solid #F1F5F9;align-items:center;background:{rowBg};transition:background .12s ease", p)}>
+                  <div key={p.name} style={css("display:grid;grid-template-columns:40px minmax(190px,1.5fr) .8fr .8fr 1.2fr .8fr .9fr .9fr 1.3fr;gap:12px;padding:14px 20px;border-bottom:1px solid #F1F5F9;align-items:center;background:{rowBg};transition:background .12s ease", p)}>
                     <span style={css("font-size:13px;font-weight:700;color:{rankColor}", p)}>{p.rank}</span>
                     <div style={css("display:flex;align-items:center;gap:10px;min-width:0")}>
                       <span style={css("width:32px;height:32px;border-radius:99px;background:{bg};color:{fg};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none", p)}>{p.initials}</span>
@@ -920,7 +920,7 @@ export function AppView({ v }: { v: RenderVals }) {
                     <input value={v.pRole} onChange={v.onPRole} placeholder="Função (ex.: Design)" style={css("padding:8px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:12.5px;outline:none;background:#FFFFFF")} />
                     <select value={v.pTeam} onChange={v.onPTeam} style={css("padding:8px 9px;border:1px solid #E2E8F0;border-radius:8px;font-size:12px;background:#FFFFFF;outline:none;cursor:pointer")}>
                       {v.teamList.map((tm) => (
-                        <option key={tm} value={tm}>{v.tm}</option>
+                        <option key={tm} value={tm}>{tm}</option>
                       ))}
                     </select>
                   </div>

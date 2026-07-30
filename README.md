@@ -8,6 +8,20 @@ Sistema de gestão de demandas — projetos macro, microtarefas, tarefas avulsas
 - Persistência local via `localStorage` (chave `central-demandas-v1`)
 - Deploy: Vercel, Netlify ou qualquer host estático
 
+## Deploy (Vercel)
+
+- **Produção:** https://central-demandas-mu.vercel.app
+- **GitHub:** https://github.com/RafaelADSdev/central-demandas
+- **Projeto Vercel:** `auzendegbrs-projects/central-demandas`
+
+Cada `git push` na branch `master` dispara deploy automático (conecte o repo no painel Vercel se ainda não estiver linkado).
+
+```bash
+vercel link --yes --project central-demandas   # link local
+vercel --prod                                  # deploy manual
+vercel env ls                                  # ver variáveis
+```
+
 ## Supabase
 
 1. No painel do Supabase, abra **SQL Editor** e execute o arquivo [`supabase/schema.sql`](supabase/schema.sql).

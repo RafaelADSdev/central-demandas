@@ -34,7 +34,7 @@ function initialAppState(store: Store): AppState {
 export function useCentralDemandas(): RenderVals {
   const dragRef = useRef<string | null>(null)
   const skipRemoteRef = useRef(false)
-  const [state, setState] = useState<AppState | null>(null)
+  const [state, setState] = useState<AppState>(() => initialAppState(defaultStore()))
   const [loading, setLoading] = useState(true)
   const [syncError, setSyncError] = useState('')
 
@@ -298,10 +298,6 @@ export function useCentralDemandas(): RenderVals {
   }, [mutate])
 
   // --- renderVals ---
-  if (!state) {
-    return { loading: true, syncError: '' }
-  }
-
   const TODAY = todayZero()
   const isoToday = isoOf(TODAY)
   const M = maps()
