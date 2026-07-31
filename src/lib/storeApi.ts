@@ -1,4 +1,5 @@
 import { supabase, supabaseConfigured } from './supabase'
+import { ensureSeedUser } from './seed'
 import type { Store } from './types'
 import { defaultStore, loadStore, saveStore } from './utils'
 
@@ -12,6 +13,7 @@ function normalizeStore(raw: unknown): Store {
   if (!Array.isArray(store.requesters)) store.requesters = []
   if (!Array.isArray(store.loose)) store.loose = []
   if (typeof store.seq !== 'number') store.seq = 1
+  ensureSeedUser(store)
   return store
 }
 
@@ -22,8 +24,14 @@ function hasLocalData(store: Store) {
     || store.loose.length > 0
 }
 
+async function finalizeStore(store: Store): Promise<Store> {
+  const changed = ensureSeedUser(store)
+  if (changed) await persistStore(store)
+  return store
+}
+
 export async function fetchStore(): Promise<Store> {
-  if (!supabaseConfigured || !supabase) return loadStore()
+  if (!supabaseConfigured || !supabase) return finalizeStore(loadStore())
 
   const { data, error } = await supabase
     .from('app_store')
@@ -33,20 +41,17 @@ export async function fetchStore(): Promise<Store> {
 
   if (error) {
     console.error('[supabase] fetch failed, using localStorage', error)
-    return loadStore()
+    return finalizeStore(loadStore())
   }
 
   const payload = data?.payload
   if (payload && typeof payload === 'object' && Object.keys(payload as object).length > 0) {
     const remote = normalizeStore(payload)
-    if (hasLocalData(remote)) return remote
+    if (hasLocalData(remote)) return finalizeStore(remote)
   }
 
   const local = loadStore()
-  if (hasLocalData(local)) {
-    await persistStore(local)
-    return local
-  }
+  if (hasLocalData(local)) return finalizeStore(local)
 
   const fresh = defaultStore()
   await persistStore(fresh)

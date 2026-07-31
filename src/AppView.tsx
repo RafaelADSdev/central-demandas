@@ -11,7 +11,10 @@ export function AppView({ v }: { v: RenderVals }) {
       
         <div style={css("display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap")}>
           <div style={css("display:flex;align-items:center;gap:14px")}>
-            <div style={css("width:34px;height:34px;border-radius:9px;background:#0F172A;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700")}>D</div>
+            <div style={css("display:flex;align-items:center;gap:12px")}>
+              <img src="/brand/hubon-logo.png" alt="hubon" style={css("height:18px;width:auto;display:block")} />
+              <img src="/brand/axis-logo.png" alt="axis" style={css("height:22px;width:auto;display:block")} />
+            </div>
             <div style={css("display:flex;flex-direction:column")}>
               <span style={css("font-size:15px;font-weight:700;letter-spacing:-.01em")}>Central de Demandas</span>
               <span style={css("font-size:11.5px;color:#94A3B8")}>Gestão de projetos, tarefas e desempenho</span>
@@ -32,7 +35,9 @@ export function AppView({ v }: { v: RenderVals }) {
               <button onClick={v.goLoose} style={css("padding:7px 14px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{navLooseBg};color:{navLooseFg};box-shadow:{navLooseShadow}", v)}>Tarefas avulsas</button>
               <button onClick={v.goCal} style={css("padding:7px 14px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{navCalBg};color:{navCalFg};box-shadow:{navCalShadow}", v)}>Calendário</button>
               <button onClick={v.goPerf} style={css("padding:7px 14px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{navPerfBg};color:{navPerfFg};box-shadow:{navPerfShadow}", v)}>Desempenho</button>
-              <button onClick={v.goReg} style={css("padding:7px 14px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{navRegBg};color:{navRegFg};box-shadow:{navRegShadow}", v)}>Cadastros</button>
+              {(v.showCadastrosNav) && (
+                <button onClick={v.goReg} style={css("padding:7px 14px;border:0;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:{navRegBg};color:{navRegFg};box-shadow:{navRegShadow}", v)}>Cadastros</button>
+              )}
             </div>
             <Hover as="button" style={css("display:flex;align-items:center;gap:7px;padding:9px 16px;border:0;border-radius:10px;background:#0F172A;color:#FFFFFF;font-size:12.5px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(15,23,42,.2)")} hover="background:#1E293B" onClick={v.openModal}>
               <span style={css("font-size:15px;line-height:1")}>+</span>
@@ -56,7 +61,9 @@ export function AppView({ v }: { v: RenderVals }) {
                 {(v.modalNeedsSetup) && (
                   <div style={css("display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:10px;background:#FFFBEB;border:1px solid #FDE68A")}>
                     <span style={css("font-size:12.5px;color:#92400E;font-weight:500")}>Cadastre ao menos 1 colaborador e 1 requerente antes de criar demandas.</span>
-                    <button onClick={v.goRegFromModal} style={css("padding:7px 14px;border:0;border-radius:8px;background:#D97706;color:#FFFFFF;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap")}>Ir para Cadastros</button>
+                    {(v.showCadastrosNav) && (
+                      <button onClick={v.goRegFromModal} style={css("padding:7px 14px;border:0;border-radius:8px;background:#D97706;color:#FFFFFF;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap")}>Ir para Cadastros</button>
+                    )}
                   </div>
                 )}
       
@@ -241,7 +248,7 @@ export function AppView({ v }: { v: RenderVals }) {
       
         {(v.showProjects) && (
           <div style={css("display:flex;flex-direction:column;gap:18px")}>
-            {(v.needsSetup) && (
+            {(v.needsSetup && v.showCadastrosNav) && (
               <div style={css("display:flex;align-items:center;justify-content:space-between;gap:16px;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:14px;padding:18px 22px;flex-wrap:wrap")}>
                 <div style={css("display:flex;flex-direction:column;gap:3px")}>
                   <span style={css("font-size:14.5px;font-weight:700")}>Comece configurando sua operação</span>
@@ -339,7 +346,9 @@ export function AppView({ v }: { v: RenderVals }) {
               <div style={css("display:flex;gap:8px")}>
                 <Hover as="button" style={css("padding:8px 15px;border:0;border-radius:9px;background:#0F172A;color:#FFFFFF;font-size:12.5px;font-weight:600;cursor:pointer")} hover="background:#1E293B" onClick={v.addMicroTask}>+ Microtarefa</Hover>
                 <Hover as="button" style={css("padding:8px 15px;border:1px solid #E2E8F0;border-radius:9px;background:#FFFFFF;color:#475569;font-size:12.5px;font-weight:600;cursor:pointer")} hover="border-color:#CBD5E1" onClick={v.editProject}>✎ Editar projeto</Hover>
+                {(v.canDelete) && (
                 <Hover as="button" style={css("padding:8px 15px;border:1px solid #FECACA;border-radius:9px;background:#FFFFFF;color:#DC2626;font-size:12.5px;font-weight:600;cursor:pointer")} hover="background:#FEF2F2" onClick={v.deleteProject}>Excluir</Hover>
+                )}
               </div>
             </div>
       
@@ -901,21 +910,64 @@ export function AppView({ v }: { v: RenderVals }) {
                   <span style={css("font-size:11.5px;font-weight:600;color:#64748B;background:#F1F5F9;border-radius:99px;padding:2px 9px")}>{v.peopleCount}</span>
                 </div>
                 {v.regPeople.map((m) => (
-                  <div key={m} style={css("display:flex;align-items:center;gap:10px;padding-bottom:11px;border-bottom:1px solid #F1F5F9")}>
-                    <span style={css("width:30px;height:30px;border-radius:99px;background:{bg};color:{fg};display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;flex:none", m)}>{m.initials}</span>
-                    <div style={css("display:flex;flex-direction:column;min-width:0;flex:1")}>
-                      <span style={css("font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap")}>{m.name}</span>
-                      <div style={css("display:flex;align-items:center;gap:6px")}>
-                        <span style={css("font-size:11px;color:#94A3B8")}>{m.role}</span>
-                        <span style={css("font-size:10px;font-weight:600;padding:1px 7px;border-radius:99px;background:{teamBg};color:{teamFg}", m)}>{m.team}</span>
+                  <div key={m.name} style={css("display:flex;flex-direction:column;gap:8px;padding-bottom:11px;border-bottom:1px solid #F1F5F9")}>
+                    <div style={css("display:flex;align-items:center;gap:10px")}>
+                      <span style={css("width:30px;height:30px;border-radius:99px;background:{bg};color:{fg};display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;flex:none", m)}>{m.initials}</span>
+                      <div style={css("display:flex;flex-direction:column;min-width:0;flex:1")}>
+                        <span style={css("font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap")}>{m.name}</span>
+                        <div style={css("display:flex;align-items:center;gap:6px")}>
+                          <span style={css("font-size:11px;color:#94A3B8")}>{m.role}</span>
+                          <span style={css("font-size:10px;font-weight:600;padding:1px 7px;border-radius:99px;background:{teamBg};color:{teamFg}", m)}>{m.team}</span>
+                        </div>
                       </div>
+                      {(m.canRemove) && (
+                        <Hover as="button" style={css("width:26px;height:26px;border:0;border-radius:7px;background:transparent;color:#CBD5E1;font-size:12px;cursor:pointer;flex:none")} hover="background:#FEF2F2;color:#DC2626" onClick={m.remove} title="Remover">✕</Hover>
+                      )}
                     </div>
-                    <Hover as="button" style={css("width:26px;height:26px;border:0;border-radius:7px;background:transparent;color:#CBD5E1;font-size:12px;cursor:pointer;flex:none")} hover="background:#FEF2F2;color:#DC2626" onClick={m.remove} title="Remover">✕</Hover>
+                    {(m.canManagePassword) && (
+                      <div style={css("display:flex;flex-direction:column;gap:6px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:8px 10px")}>
+                        {(m.isEditingPassword) ? (
+                          <div style={css("display:flex;flex-direction:column;gap:6px")}>
+                            <span style={css("font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#94A3B8")}>Nova senha</span>
+                            <input
+                              value={m.editPasswordValue}
+                              onChange={m.onEditPassword}
+                              type="text"
+                              placeholder="Senha de acesso"
+                              style={css("padding:7px 10px;border:1px solid #E2E8F0;border-radius:7px;font-size:12px;outline:none;background:#FFFFFF")}
+                            />
+                            <div style={css("display:flex;gap:6px")}>
+                              <button type="button" onClick={m.savePassword} style={css("padding:6px 10px;border:0;border-radius:7px;background:#0F172A;color:#FFFFFF;font-size:11.5px;font-weight:600;cursor:pointer")}>Salvar</button>
+                              <button type="button" onClick={m.cancelEditPassword} style={css("padding:6px 10px;border:1px solid #E2E8F0;border-radius:7px;background:#FFFFFF;color:#475569;font-size:11.5px;font-weight:600;cursor:pointer")}>Cancelar</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div style={css("display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap")}>
+                            <div style={css("display:flex;align-items:center;gap:6px;min-width:0")}>
+                              <span style={css("font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#94A3B8")}>Senha</span>
+                              <span style={css("font-size:12px;color:#475569;font-family:ui-monospace,monospace")}>{m.passwordLabel}</span>
+                            </div>
+                            <div style={css("display:flex;gap:4px")}>
+                              <button type="button" onClick={m.togglePasswordVisible} style={css("padding:4px 8px;border:1px solid #E2E8F0;border-radius:6px;background:#FFFFFF;color:#475569;font-size:11px;font-weight:600;cursor:pointer")}>
+                                {m.isPasswordVisible ? 'Ocultar' : 'Ver'}
+                              </button>
+                              <button type="button" onClick={m.startEditPassword} style={css("padding:4px 8px;border:1px solid #E2E8F0;border-radius:6px;background:#FFFFFF;color:#475569;font-size:11px;font-weight:600;cursor:pointer")}>Editar</button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
                 <div style={css("display:flex;flex-direction:column;gap:8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px")}>
                   <span style={css("font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#94A3B8")}>Adicionar colaborador</span>
                   <input value={v.pName} onChange={v.onPName} placeholder="Nome completo" style={css("padding:8px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:12.5px;outline:none;background:#FFFFFF")} />
+                  <div style={css("display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center")}>
+                    <input value={v.pPassword} onChange={v.onPPassword} placeholder="Senha de acesso" type={v.pPasswordVisible ? 'text' : 'password'} style={css("padding:8px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:12.5px;outline:none;background:#FFFFFF")} />
+                    <button type="button" onClick={v.toggleNewPasswordVisible} style={css("padding:8px 10px;border:1px solid #E2E8F0;border-radius:8px;background:#FFFFFF;color:#475569;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap")}>
+                      {v.pPasswordVisible ? 'Ocultar' : 'Ver'}
+                    </button>
+                  </div>
                   <div style={css("display:grid;grid-template-columns:1fr 1fr;gap:8px")}>
                     <input value={v.pRole} onChange={v.onPRole} placeholder="Função (ex.: Design)" style={css("padding:8px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:12.5px;outline:none;background:#FFFFFF")} />
                     <select value={v.pTeam} onChange={v.onPTeam} style={css("padding:8px 9px;border:1px solid #E2E8F0;border-radius:8px;font-size:12px;background:#FFFFFF;outline:none;cursor:pointer")}>
@@ -940,7 +992,9 @@ export function AppView({ v }: { v: RenderVals }) {
                       <span style={css("font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap")}>{m.name}</span>
                       <span style={css("font-size:11px;color:#94A3B8")}>{m.role}</span>
                     </div>
+                    {(m.canRemove) && (
                     <Hover as="button" style={css("width:26px;height:26px;border:0;border-radius:7px;background:transparent;color:#CBD5E1;font-size:12px;cursor:pointer;flex:none")} hover="background:#FEF2F2;color:#DC2626" onClick={m.remove} title="Remover">✕</Hover>
+                    )}
                   </div>
                 ))}
                 <div style={css("display:flex;flex-direction:column;gap:8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px")}>
@@ -963,7 +1017,9 @@ export function AppView({ v }: { v: RenderVals }) {
                       <span style={css("font-size:13px;font-weight:600")}>{m.name}</span>
                       <span style={css("font-size:11px;color:#94A3B8")}>{m.count} colaborador(es)</span>
                     </div>
+                    {(m.canRemove) && (
                     <Hover as="button" style={css("width:26px;height:26px;border:0;border-radius:7px;background:transparent;color:#CBD5E1;font-size:12px;cursor:pointer;flex:none")} hover="background:#FEF2F2;color:#DC2626" onClick={m.remove} title="Remover">✕</Hover>
+                    )}
                   </div>
                 ))}
                 <div style={css("display:flex;flex-direction:column;gap:8px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 14px")}>

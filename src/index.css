@@ -14,6 +14,40 @@ a:hover {
 input, select, button, textarea {
   font-family: inherit;
 }
+.login-field:focus-visible {
+  border-color: #94A3B8 !important;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
+}
+.login-submit:focus-visible {
+  outline: 2px solid #0F172A;
+  outline-offset: 2px;
+}
+.login-submit:disabled,
+.login-field:disabled {
+  opacity: 0.72;
+  cursor: not-allowed;
+}
+.login-field::placeholder {
+  color: #94A3B8;
+}
+@media (max-width: 860px) {
+  .login-shell {
+    flex-direction: column !important;
+  }
+  .login-brand-panel {
+    min-height: 220px;
+    justify-content: center !important;
+    padding: 36px 28px !important;
+  }
+  .login-brand-panel > div:last-child {
+    text-align: center !important;
+    margin-left: 0 !important;
+  }
+  .login-brand-panel p {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
 ::-webkit-scrollbar {
   height: 10px;
   width: 10px;

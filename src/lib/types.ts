@@ -2,6 +2,7 @@ export interface Person {
   name: string
   role: string
   team: string
+  password?: string
 }
 
 export interface Requester {
@@ -104,7 +105,12 @@ export interface AppState {
   perfMonth: string | null
   pName: string
   pRole: string
+  pPassword: string
+  pPasswordVisible: boolean
   pTeam: string
+  pwdEditName: string | null
+  pwdEditValue: string
+  pwdReveal: Record<string, boolean>
   rName: string
   rRole: string
   tmName: string

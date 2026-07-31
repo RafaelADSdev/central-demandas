@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import type { Store } from './types'
+import { ensureSeedUser } from './seed'
 
 function parseCss(str: string): CSSProperties {
   const o: Record<string, string> = {}
@@ -68,7 +69,16 @@ export function uid() {
 }
 
 export function defaultStore(): Store {
-  return { teams: ['Marketing', 'Tecnologia', 'Financeiro', 'Secretaria de Vendas'], people: [], requesters: [], projects: [], loose: [], seq: 1 }
+  const store: Store = {
+    teams: ['Marketing', 'Tecnologia', 'Financeiro', 'Secretaria de Vendas'],
+    people: [],
+    requesters: [],
+    projects: [],
+    loose: [],
+    seq: 1,
+  }
+  ensureSeedUser(store)
+  return store
 }
 
 export function loadStore(): Store {
@@ -78,6 +88,7 @@ export function loadStore(): Store {
       const store = JSON.parse(raw) as Store
       if (store && Array.isArray(store.projects)) {
         if (!Array.isArray(store.teams) || !store.teams.length) store.teams = defaultStore().teams
+        ensureSeedUser(store)
         return store
       }
     }

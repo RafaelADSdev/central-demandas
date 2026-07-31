@@ -27,11 +27,14 @@ function initialAppState(store: Store): AppState {
     modalOpen: false, draft: null, draftError: '',
     taskDraft: null, taskError: '',
     cal: null, perfMonth: null,
-    pName: '', pRole: '', pTeam: store.teams[0], rName: '', rRole: '', tmName: '', regError: '',
+    pName: '', pRole: '', pPassword: '', pPasswordVisible: false, pTeam: store.teams[0],
+    pwdEditName: null, pwdEditValue: '', pwdReveal: {},
+    rName: '', rRole: '', tmName: '', regError: '',
   }
 }
 
-export function useCentralDemandas(): RenderVals {
+export function useCentralDemandas(opts?: { isAdmin?: boolean }): RenderVals {
+  const isAdmin = opts?.isAdmin ?? false
   const dragRef = useRef<string | null>(null)
   const skipRemoteRef = useRef(false)
   const [state, setState] = useState<AppState>(() => initialAppState(defaultStore()))
@@ -269,6 +272,7 @@ export function useCentralDemandas(): RenderVals {
   }, [mutate, state.taskDraft])
 
   const deleteTask = useCallback(() => {
+    if (!isAdmin) return
     const td = state.taskDraft
     if (!td) return
     if (!window.confirm('Excluir esta tarefa? Esta ação não pode ser desfeita.')) return
@@ -279,7 +283,7 @@ export function useCentralDemandas(): RenderVals {
         if (p) p.tasks = p.tasks.filter(x => x.id !== td.taskId)
       }
     }, { taskDraft: null })
-  }, [mutate, state.taskDraft])
+  }, [isAdmin, mutate, state.taskDraft])
 
   const dropOn = useCallback((projId: string, statusKey: string) => {
     const d = dragRef.current
@@ -434,13 +438,20 @@ export function useCentralDemandas(): RenderVals {
   }).filter(p => p.assigned > 0)
 
   const perfEmpty = people.length === 0
+  const needsSetup = !st.people.length || !st.requesters.length
+  const canAccessCadastros = isAdmin || !st.people.length
+  let regView = view === 'reg'
+  if (regView && !canAccessCadastros) regView = false
+  if (view === 'reg' && !canAccessCadastros) view = 'projects'
 
   const vals: RenderVals = {
     loading: false,
     syncError,
     showProjects: view === 'projects', showDetail: view === 'detail', showLoose: view === 'loose',
-    showCal: view === 'cal', showPerf: view === 'perf', showReg: view === 'reg',
-    needsSetup: !st.people.length || !st.requesters.length,
+    showCal: view === 'cal', showPerf: view === 'perf', showReg: regView,
+    showCadastrosNav: canAccessCadastros,
+    canDelete: isAdmin,
+    needsSetup,
     noProjects: summaries.length === 0,
     projects: summaries.map(s => ({ ...s, open: () => setState(prev => ({ ...prev, view: 'detail', projectId: s.id, q: '', owner: 'Todos os responsáveis', requester: 'Todos os requerentes', status: 'Todos os status', lateOnly: false })) })),
     portfolioStats: [
@@ -461,7 +472,7 @@ export function useCentralDemandas(): RenderVals {
     goLoose: () => setState(s => ({ ...s, view: 'loose' })),
     goCal: () => setState(s => ({ ...s, view: 'cal' })),
     goPerf: () => setState(s => ({ ...s, view: 'perf' })),
-    goReg: () => setState(s => ({ ...s, view: 'reg' })),
+    goReg: () => { if (canAccessCadastros) setState(s => ({ ...s, view: 'reg' })) },
     navProjBg: onProjects ? '#FFFFFF' : 'transparent', navProjFg: onProjects ? '#0F172A' : '#64748B', navProjShadow: onProjects ? '0 1px 2px rgba(15,23,42,.10)' : 'none',
     navLooseBg: view === 'loose' ? '#FFFFFF' : 'transparent', navLooseFg: view === 'loose' ? '#0F172A' : '#64748B', navLooseShadow: view === 'loose' ? '0 1px 2px rgba(15,23,42,.10)' : 'none',
     navCalBg: view === 'cal' ? '#FFFFFF' : 'transparent', navCalFg: view === 'cal' ? '#0F172A' : '#64748B', navCalShadow: view === 'cal' ? '0 1px 2px rgba(15,23,42,.10)' : 'none',
@@ -471,7 +482,7 @@ export function useCentralDemandas(): RenderVals {
     modalOpen: state.modalOpen,
     modalTitle: draft.editing ? 'Editar projeto' : 'Nova demanda',
     modalNeedsSetup: !st.people.length || !st.requesters.length,
-    goRegFromModal: () => setState(s => ({ ...s, modalOpen: false, view: 'reg' })),
+    goRegFromModal: () => { if (canAccessCadastros) setState(s => ({ ...s, modalOpen: false, view: 'reg' })) },
     openModal: () => setState(s => ({ ...s, modalOpen: true, draft: blankDraft(s.store), draftError: '' })),
     closeModal: () => setState(s => ({ ...s, modalOpen: false, draftError: '' })),
     isCreating: !draft.editing,
@@ -523,7 +534,7 @@ export function useCentralDemandas(): RenderVals {
     tStatus: td?.status ?? 'backlog', onTStatus: (e: React.ChangeEvent<HTMLSelectElement>) => setTaskDraft({ status: e.target.value }),
     tProgress: td?.progress ?? 0, onTProgress: (e: React.ChangeEvent<HTMLInputElement>) => setTaskDraft({ progress: Number(e.target.value) }),
     tIsProj: td ? td.scope === 'project' : true, tIsLoose: td ? td.scope === 'loose' : false,
-    tCanDelete: td ? td.mode === 'edit' : false,
+    tCanDelete: isAdmin && td ? td.mode === 'edit' : false,
     hasTaskError: !!state.taskError, taskError: state.taskError,
     closeTask: () => setState(s => ({ ...s, taskDraft: null, taskError: '' })),
     saveTask,
@@ -551,16 +562,55 @@ export function useCentralDemandas(): RenderVals {
     regPeople: st.people.map(p => {
       const c = M.PEOPLE[p.name] || PALETTE[7]
       const tcm = M.TEAMS[p.team] || PALETTE[7]
+      const storedPassword = p.password ?? ''
+      const isEditingPassword = state.pwdEditName === p.name
+      const isPasswordVisible = Boolean(state.pwdReveal[p.name])
       return {
         name: p.name, role: p.role, team: p.team, initials: initials(p.name), bg: c.bg, fg: c.fg, teamBg: tcm.bg, teamFg: tcm.fg,
-        remove: () => { if (window.confirm('Remover ' + p.name + '? As tarefas existentes continuam com o nome registrado.')) mutate(s => { s.people = s.people.filter(x => x.name !== p.name) }) },
+        canRemove: isAdmin,
+        canManagePassword: isAdmin,
+        isEditingPassword,
+        isPasswordVisible,
+        passwordLabel: storedPassword
+          ? (isPasswordVisible ? storedPassword : '•'.repeat(Math.min(storedPassword.length, 8)))
+          : 'Sem senha',
+        editPasswordValue: isEditingPassword ? state.pwdEditValue : storedPassword,
+        onEditPassword: (e: React.ChangeEvent<HTMLInputElement>) => setState(s => ({ ...s, pwdEditValue: e.target.value })),
+        togglePasswordVisible: () => setState(s => ({
+          ...s,
+          pwdReveal: { ...s.pwdReveal, [p.name]: !s.pwdReveal[p.name] },
+        })),
+        startEditPassword: () => setState(s => ({
+          ...s,
+          pwdEditName: p.name,
+          pwdEditValue: storedPassword,
+          regError: '',
+        })),
+        savePassword: () => {
+          if (!isAdmin) return
+          const val = state.pwdEditValue.trim()
+          if (!val) return setState(s => ({ ...s, regError: 'Informe a senha do colaborador.' }))
+          mutate(s => {
+            const person = s.people.find(x => x.name === p.name)
+            if (person) person.password = val
+          }, { pwdEditName: null, pwdEditValue: '', regError: '' })
+        },
+        cancelEditPassword: () => setState(s => ({ ...s, pwdEditName: null, pwdEditValue: '', regError: '' })),
+        remove: () => {
+          if (!isAdmin) return
+          if (window.confirm('Remover ' + p.name + '? As tarefas existentes continuam com o nome registrado.')) mutate(s => { s.people = s.people.filter(x => x.name !== p.name) }, { pwdEditName: state.pwdEditName === p.name ? null : state.pwdEditName })
+        },
       }
     }),
     regReqs: st.requesters.map(r => {
       const c = M.REQ[r.name] || { bg: '#F1F5F9', fg: '#475569' }
       return {
         name: r.name, role: r.role, initials: initials(r.name), bg: c.bg, fg: c.fg,
-        remove: () => { if (window.confirm('Remover requerente ' + r.name + '?')) mutate(s => { s.requesters = s.requesters.filter(x => x.name !== r.name) }) },
+        canRemove: isAdmin,
+        remove: () => {
+          if (!isAdmin) return
+          if (window.confirm('Remover requerente ' + r.name + '?')) mutate(s => { s.requesters = s.requesters.filter(x => x.name !== r.name) })
+        },
       }
     }),
     regTeams: st.teams.map(t => {
@@ -568,7 +618,9 @@ export function useCentralDemandas(): RenderVals {
       const count = st.people.filter(p => p.team === t).length
       return {
         name: t, dot: tcm.dot, count,
+        canRemove: isAdmin,
         remove: () => {
+          if (!isAdmin) return
           if (count > 0) { setState(s => ({ ...s, regError: 'A equipe "' + t + '" tem colaboradores vinculados — mova-os antes de remover.' })); return }
           if (st.teams.length <= 1) { setState(s => ({ ...s, regError: 'É preciso manter ao menos uma equipe.' })); return }
           if (window.confirm('Remover equipe ' + t + '?')) mutate(s => { s.teams = s.teams.filter(x => x !== t) }, { regError: '' })
@@ -577,14 +629,20 @@ export function useCentralDemandas(): RenderVals {
     }),
     pName: state.pName, onPName: (e: React.ChangeEvent<HTMLInputElement>) => setState(s => ({ ...s, pName: e.target.value, regError: '' })),
     pRole: state.pRole, onPRole: (e: React.ChangeEvent<HTMLInputElement>) => setState(s => ({ ...s, pRole: e.target.value })),
+    pPassword: state.pPassword, onPPassword: (e: React.ChangeEvent<HTMLInputElement>) => setState(s => ({ ...s, pPassword: e.target.value })),
+    pPasswordVisible: state.pPasswordVisible,
+    toggleNewPasswordVisible: () => setState(s => ({ ...s, pPasswordVisible: !s.pPasswordVisible })),
     pTeam: st.teams.indexOf(state.pTeam) >= 0 ? state.pTeam : st.teams[0],
     onPTeam: (e: React.ChangeEvent<HTMLSelectElement>) => setState(s => ({ ...s, pTeam: e.target.value })),
     addPerson: () => {
+      if (!canAccessCadastros) return
       const n = state.pName.trim()
       if (!n) return setState(s => ({ ...s, regError: 'Informe o nome do colaborador.' }))
+      if (!state.pPassword) return setState(s => ({ ...s, regError: 'Informe a senha de acesso do colaborador.' }))
       if (st.people.some(p => p.name.toLowerCase() === n.toLowerCase())) return setState(s => ({ ...s, regError: 'Já existe um colaborador com esse nome.' }))
       const tmv = st.teams.indexOf(state.pTeam) >= 0 ? state.pTeam : st.teams[0]
-      mutate(s => { s.people.push({ name: n, role: state.pRole.trim() || 'Colaborador(a)', team: tmv }) }, { pName: '', pRole: '', regError: '' })
+      const role = state.pRole.trim() || 'Colaborador(a)'
+      mutate(s => { s.people.push({ name: n, role, team: tmv, password: state.pPassword }) }, { pName: '', pRole: '', pPassword: '', pPasswordVisible: false, regError: '' })
     },
     rName: state.rName, onRName: (e: React.ChangeEvent<HTMLInputElement>) => setState(s => ({ ...s, rName: e.target.value, regError: '' })),
     rRole: state.rRole, onRRole: (e: React.ChangeEvent<HTMLInputElement>) => setState(s => ({ ...s, rRole: e.target.value })),
@@ -813,6 +871,7 @@ export function useCentralDemandas(): RenderVals {
         },
       })),
       deleteProject: () => {
+        if (!isAdmin) return
         if (window.confirm('Excluir o projeto "' + cur.name + '" e todas as suas microtarefas?')) {
           mutate(s => { s.projects = s.projects.filter(x => x.id !== cur.id) }, { view: 'projects', projectId: null })
         }
