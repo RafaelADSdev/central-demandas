@@ -1,7 +1,20 @@
+# Dependencies & build
 node_modules
 dist
+dist-ssr
+.next
+*.log
+tsconfig.tsbuildinfo
+
+# Local tooling / deploy state
+.cursor/
+.impeccable/
 .netlify
+.vercel
+agent-transcripts/
+
+# Secrets & local overrides
 .env
 .env.local
 .env.*.local
-.vercel
+.project/ACESSOS.md
